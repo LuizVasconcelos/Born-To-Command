@@ -14,5 +14,7 @@ public class GameClass
 		soldiers = new List<Soldier>();
 		levels = new List<Level>();
 	}
+
+
 }
 

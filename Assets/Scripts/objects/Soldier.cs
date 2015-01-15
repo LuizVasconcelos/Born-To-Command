@@ -3,20 +3,20 @@ using System.Collections;
 
 public class Soldier
 {
-	private string Type;
+	private string TypeSoldier;
 	private int HealthPoints;
 	private int ExperiencePoints;
 	private Weapon WeaponSoldier;
 
 	Soldier(string Type, Weapon WeaponSoldier){
-		this.Type = Type;
+		this.TypeSoldier = Type;
 		this.HealthPoints = 0;
 		this.ExperiencePoints = 0;
 		this.WeaponSoldier = WeaponSoldier;
 	}
 
-	public string GetType(){
-		return this.Type;
+	public string GetTypeSoldier(){
+		return this.TypeSoldier;
 	}
 
 	public void decreaseHealth(int Value){
@@ -37,16 +37,9 @@ public class Soldier
 		}
 		return Died;
 	}
-
-	public void decreaseWeaponPower(int Value){
-		bool Died = false;
-		if(this.WeaponSoldier > Value){
-			this.WeaponSoldier = this.WeaponSoldier - Value;
-		}else{
-			this.WeaponSoldier = 0;
-			Died = true;
-		}
-		return Died;
+	// Diminish the weapon power and returns the liveness of player
+	public bool decreaseWeaponPower(int Value){
+		return WeaponSoldier.makeDamage(Value);
 	}
 
 }

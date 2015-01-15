@@ -12,11 +12,13 @@ public class Weapon
 		this.Payload = Payload;
 	}
 
-	public void makeDamage(int Value){
+	public bool makeDamage(int Value){
 		if(this.Payload > Value){
 			this.Payload = this.Payload - Value;
+			return false;
 		}else{
 			this.Payload = 0;
+			return true;
 		}
 	}
 

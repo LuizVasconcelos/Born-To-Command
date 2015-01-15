@@ -49,7 +49,6 @@ public class AdjustScript : MonoBehaviour
 		if(GUI.Button (new Rect(60,445,100,20), "Load")){
 			Debug.Log ("Loading from file");
 			GameControlTest.control.Load ();
-
 			Debug.Log ("Loaded");
 		}
 

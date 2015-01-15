@@ -14,7 +14,7 @@ http://unity3d.com/learn/tutorials/modules/beginner/scripting/monodevelops-debug
  */
 
 [Serializable]
-public class GameControl : MonoBehaviour {
+public class GameControlTest : MonoBehaviour {
 
 	public static GameControl control;
 

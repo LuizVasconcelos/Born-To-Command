@@ -3,11 +3,20 @@ using System.Collections;
 
 public class Soldier
 {
-	private string TypeSoldier;
-	private int HealthPoints;
-	private int ExperiencePoints;
-	private Weapon WeaponSoldier;
+	private string TypeSoldier; // Tipo de soldado
+	private int HealthPoints; // Pontos de Saude
+	private int ExperiencePoints; // Pontos de experiencia (Usado para moral do General)
+	private Weapon WeaponSoldier; // Arma usada pelo soldado
 
+	// Construtor para Soldados que nao possuem armas
+	Soldier(string TypeSoldier){
+		this.TypeSoldier = TypeSoldier;
+		this.HealthPoints = 0;
+		this.ExperiencePoints = 0;
+		this.WeaponSoldier = null;
+	}
+		
+	// Construtor para Soldados armados
 	Soldier(string Type, Weapon WeaponSoldier){
 		this.TypeSoldier = Type;
 		this.HealthPoints = 0;
@@ -19,7 +28,11 @@ public class Soldier
 		return this.TypeSoldier;
 	}
 
-	public void decreaseHealth(int Value){
+	public void IncreaseHealth(int Value){
+		this.HealthPoints = this.HealthPoints + Value;
+	}
+
+	public void DecreaseHealth(int Value){
 		if(this.HealthPoints > Value){
 			this.HealthPoints = this.HealthPoints - Value;
 		}else{
@@ -27,7 +40,7 @@ public class Soldier
 		}
 	}
 
-	public bool decreaseExperience(int Value){
+	public bool DecreaseExperience(int Value){
 		bool Died = false;
 		if(this.ExperiencePoints > Value){
 			this.ExperiencePoints = this.ExperiencePoints - Value;
@@ -37,9 +50,10 @@ public class Soldier
 		}
 		return Died;
 	}
+
 	// Diminish the weapon power and returns the liveness of player
-	public bool decreaseWeaponPower(int Value){
-		return WeaponSoldier.makeDamage(Value);
+	public bool DecreaseWeaponPower(int Value){
+		return WeaponSoldier.MakeDamage(Value);
 	}
 
 }

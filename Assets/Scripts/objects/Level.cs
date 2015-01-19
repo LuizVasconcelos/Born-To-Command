@@ -3,8 +3,10 @@ using System.Collections;
 
 public class Level
 {
+	// Identificacao do Level 
 	private int Id;
-	private int Status;
+	// Definir status do Level: (Nao jogado, concluido, nao concluido)
+	private int Status; 
 
 	public Level(int Id, int Status){
 		this.Id = Id;

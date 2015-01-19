@@ -38,7 +38,7 @@ public class AdjustScript : MonoBehaviour
 		if(GUI.Button (new Rect(60,370,100,20), "Experience up")){
 			GameControlTest.control.experience += 10;
 		}
-		if(GUI.Button (new Rect(60,395,100,20), "Experience up")){
+		if(GUI.Button (new Rect(60,395,100,20), "Experience down")){
 			GameControlTest.control.experience -= 10;
 		}
 		if(GUI.Button (new Rect(60,420,100,20), "Save")){

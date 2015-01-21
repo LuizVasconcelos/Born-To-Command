@@ -33,7 +33,7 @@ public class scriptMainScene : MonoBehaviour {
 			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 
 			// open phase
-			if (Camera.main.camera.orthographicSize <= 0.06f) 
+			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
 			{
 				Application.LoadLevel ("blacksmithScene");
 			}
@@ -53,7 +53,7 @@ public class scriptMainScene : MonoBehaviour {
 			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 			
 			// open phase
-			if (Camera.main.camera.orthographicSize <= 0.06f) 
+			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
 			{
 				Application.LoadLevel ("medicalCenterScene");
 			}
@@ -73,7 +73,7 @@ public class scriptMainScene : MonoBehaviour {
 			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 			
 			// open phase
-			if (Camera.main.camera.orthographicSize <= 0.06f) 
+			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
 			{
 				Application.LoadLevel ("trainingCenterScene");
 			}
@@ -93,7 +93,7 @@ public class scriptMainScene : MonoBehaviour {
 			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 			
 			// open phase
-			if (Camera.main.camera.orthographicSize <= 0.06f) 
+			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
 			{
 				Application.LoadLevel ("carpenterScene");
 			}

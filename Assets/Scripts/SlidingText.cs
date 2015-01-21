@@ -31,7 +31,7 @@ public class SlidingText : MonoBehaviour {
 
 		// open phase
 
-		//Debug.Log ("Label -> Y: " + gameObject.transform.position.y + "; Param -> Y: "+param.transform.position.y);
+		Debug.Log ("Label -> Y: " + gameObject.transform.position.y + "; Param -> Y: "+param.transform.position.y);
 		if (gameObject.transform.position.y >= param.transform.position.y) 
 		{
 			Application.LoadLevel ("mainScene");

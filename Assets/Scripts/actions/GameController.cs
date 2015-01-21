@@ -9,37 +9,51 @@ using System.IO;
 public class GameController : MonoBehaviour {
 	
 	/**
-	http://stackoverflow.com/questions/17286308/how-to-write-an-xml-file-in-c-sharp-in-unity
-
+	 * Links:
+	 *  http://stackoverflow.com/questions/17286308/how-to-write-an-xml-file-in-c-sharp-in-unity
 	 */
-	
+
+	string path;
+
 	void Awake(){
-		/*
+		path = Application.persistentDataPath + "/PlayerData.xml";
+		SaveGame();
+		Player player = LoadGame();
+
+		// Testing reading file
+		Debug.Log ("Health: " + player.Health + " Level: " + player.Level);
+		string aux = "";
+		foreach (Test t in player.Lista){
+			aux += t.AtributoTeste + " ";
+		}
+		Debug.Log ("Lista: " + aux);
+	}
+
+	// Writing data to file PlayerData.xml
+	void SaveGame(){
 		XmlSerializer xmls = new XmlSerializer(typeof(Player));
-		
-		StringWriter sw = new StringWriter();
-		xmls.Serialize(sw, new Player { Level = 5, Health = 500 });
-		string xml = sw.ToString();
-		
-		Player player = xmls.Deserialize(new StringReader(xml)) as Player;
-		Debug.Log (xml);
-		*/
-		
-		XmlSerializer xmls = new XmlSerializer(typeof(Player));
-		string path = Application.persistentDataPath + "/PlayerData.xml";
 		using (var stream = File.OpenWrite(path)){
-			xmls.Serialize(stream, new Player { Level = 5, Health = 500, Lista = new List<string>{"string1", "string2"} });
+			List<Test> list = new List<Test>();
+			list.Add(new Test(2));
+			list.Add (new Test(3));
+			list.Add (new Test(4));
+			list.Add (new Test(5));
+			list.Add (new Test(6));
+			xmls.Serialize(stream, new Player { Level = 5, Health = 500, Lista = list });
 		}
 		Debug.Log (path);
-		
-		// Reading data from Player
+	}
+
+	// Reading data from Player
+	Player LoadGame(){
+		XmlSerializer xmls = new XmlSerializer(typeof(Player));
 		Player player = null;
 		using (var stream = File.OpenRead(path)){
 			player = xmls.Deserialize(stream) as Player;
 		}
-		
-		Debug.Log ("Health: " + player.Health + " Level: " + player.Level);
+		return player;
 	}
+
 }
 
 [XmlRoot]
@@ -52,7 +66,19 @@ public class Player
 	public int Health { get; set; }
 	
 	[XmlArray("Lista")]
-	[XmlArrayItem("string")]
-	public List<string> Lista;
+	[XmlArrayItem("test")]
+	public List<Test> Lista;
+}
+
+
+public class Test{
+
+	public int AtributoTeste { get; set; }	
+
+	public Test(int Value){
+		this.AtributoTeste = Value;
+	}
+	// This empty construtor is mandatory
+	public Test(){}
 }
 

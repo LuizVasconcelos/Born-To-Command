@@ -10,18 +10,21 @@ public class scriptMainMenu : MonoBehaviour {
 	void Update () {}
 
 	void OnNewGameClicked(){
+		Debug.Log("On New Game");
 		Application.LoadLevel("prologueScene");
 	}
 
 	void OnLoadGameClicked(){
-
+		Debug.Log("On Load Game");
+		Application.LoadLevel ("SaveGameMenuScene");
 	}
 
 	void OnOptionsClicked(){
-
+		Debug.Log("On Options");
 	}
 
 	void OnExitClicked(){
+		Debug.Log("On Exit");
 		Application.Quit();
 	}
 }

@@ -5,19 +5,19 @@ using System.Xml.Serialization;
 using System.Collections;
 using System.IO;
 
-public class GameController : MonoBehaviour {
+public class GameController {
 	
 	/**
 	 * Links:
 	 *  http://stackoverflow.com/questions/17286308/how-to-write-an-xml-file-in-c-sharp-in-unity
 	 */
 
-	string path;
+	string path = Application.persistentDataPath + "/PlayerData.xml";
+	string filename = Application.persistentDataPath + "/PlayerData";
 
 	void Awake(){
-		path = Application.persistentDataPath + "/PlayerData.xml";
-		SaveGame();
-		Player player = LoadGame();
+		SaveGame(0);
+		Player player = LoadGame(0);
 
 		// Testing reading file
 		Debug.Log ("Health: " + player.Health + " Level: " + player.Level);
@@ -29,9 +29,9 @@ public class GameController : MonoBehaviour {
 	}
 
 	// Writing data to file PlayerData.xml
-	void SaveGame(){
+	public void SaveGame(int gameNumber){
 		XmlSerializer xmls = new XmlSerializer(typeof(Player));
-		using (var stream = File.OpenWrite(path)){
+		using (var stream = File.OpenWrite(filename + gameNumber + ".xml")){
 			List<Test> list = new List<Test>();
 			list.Add(new Test(2));
 			list.Add (new Test(3));
@@ -44,12 +44,13 @@ public class GameController : MonoBehaviour {
 	}
 
 	// Reading data from Player
-	Player LoadGame(){
+	public Player LoadGame(int gameNumber){
 		XmlSerializer xmls = new XmlSerializer(typeof(Player));
 		Player player = null;
-		using (var stream = File.OpenRead(path)){
+		using (var stream = File.OpenRead(filename + gameNumber + ".xml")){
 			player = xmls.Deserialize(stream) as Player;
 		}
+		Debug.Log ("Loaded Game");
 		return player;
 	}
 

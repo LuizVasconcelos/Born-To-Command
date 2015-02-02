@@ -7,7 +7,11 @@ public class scriptMainScene : MonoBehaviour {
 	private bool isMedicalCenterClicked;
 	private bool isTrainingCenterClicked;
 	private bool isCarpenterClicked;
+	private bool isMissionsClicked;
 	private bool isSaveGameClicked;
+
+	private GameObject btnMissions;
+	private Vector3 currentRotation;
 
 	private bool showMessage;
 
@@ -17,9 +21,13 @@ public class scriptMainScene : MonoBehaviour {
 		isMedicalCenterClicked = false;
 		isTrainingCenterClicked = false;
 		isCarpenterClicked = false;
+		isMissionsClicked = false;
 		isSaveGameClicked = false;
 
 		showMessage = false;
+
+		btnMissions = GameObject.Find ("btnMissions");
+		currentRotation = new Vector3(btnMissions.transform.rotation.x,btnMissions.transform.rotation.y,btnMissions.transform.rotation.z);
 	}
 	
 	// Update is called once per frame
@@ -104,6 +112,41 @@ public class scriptMainScene : MonoBehaviour {
 				Application.LoadLevel ("carpenterScene");
 			}
 		}
+		else if (isMissionsClicked) 
+		{
+			if(btnMissions.transform.rotation.eulerAngles.z <= 89) 
+			{
+				btnMissions.transform.Rotate(new Vector3(currentRotation.x,currentRotation.y,90)*Time.deltaTime);
+			}
+			else
+			{
+				Vector3 currentPosition = btnMissions.transform.position;
+				Vector3 currentScale = btnMissions.transform.localScale;
+				Vector3 target = new Vector3(1.5f, 0.0f, currentPosition.z);
+				Vector3 velocity = new Vector3(0.0f, 0.0f, 0.0f);
+				float currentVelocity = 0.0f;
+				float smoothTime = 0.2f;
+
+				btnMissions.transform.position = Vector3.SmoothDamp(currentPosition, target, ref velocity, smoothTime);
+
+				Debug.Log("x: " + btnMissions.transform.position.x);
+
+				if((btnMissions.transform.position.x >= 1.49f) && 
+					(btnMissions.transform.position.y >= (-0.01f)))
+				{
+
+					target = new Vector3(3.0f, 0.9f, currentPosition.z);
+
+					btnMissions.transform.localScale = Vector3.SmoothDamp(currentScale, target, ref velocity, smoothTime);
+
+					if((btnMissions.transform.localScale.x >= 2.99f) &&
+					   (btnMissions.transform.localScale.y >= 0.89f))
+					{
+						isMissionsClicked = false;
+					}
+				}
+			}
+		}
 		else if (isSaveGameClicked)
 		{
 			isSaveGameClicked = false;
@@ -145,6 +188,11 @@ public class scriptMainScene : MonoBehaviour {
 	void onCarpenterClicked()
 	{
 		isCarpenterClicked = true;
+	}
+
+	void onMissionsClicked()
+	{
+		isMissionsClicked = true;
 	}
 
 	void OnSaveGameClicked()

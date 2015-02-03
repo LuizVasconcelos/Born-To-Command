@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine;
+using UnityEditor;
 
 public class scriptMainScene : MonoBehaviour {
 
@@ -9,6 +11,11 @@ public class scriptMainScene : MonoBehaviour {
 	private bool isCarpenterClicked;
 	private bool isMissionsClicked;
 	private bool isSaveGameClicked;
+
+	// mission 1 objs
+	private bool isTarget1Clicked;
+	private GameObject btnTarget1;
+	private GameObject panel;
 
 	private GameObject btnMissions;
 	private Vector3 currentRotation;
@@ -28,139 +35,125 @@ public class scriptMainScene : MonoBehaviour {
 
 		btnMissions = GameObject.Find ("btnMissions");
 		currentRotation = new Vector3(btnMissions.transform.rotation.x,btnMissions.transform.rotation.y,btnMissions.transform.rotation.z);
+
+		btnTarget1 = GameObject.Find ("btnTarget1");
+
+		panel = GameObject.Find ("Panel");
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (isBlacksmithClicked) 
-		{
-			// current camera depth
-			float current = Camera.main.camera.orthographicSize;
-			// hardcoded target depth
-			float target = 0.05f;
-			// 0.0 for default
-			float currentVelocity = 0.0f;
-			// 0.15 for default
-			float smoothTime = 0.15f;
+		if (isBlacksmithClicked) {
+						// current camera depth
+						float current = Camera.main.camera.orthographicSize;
+						// hardcoded target depth
+						float target = 0.05f;
+						// 0.0 for default
+						float currentVelocity = 0.0f;
+						// 0.15 for default
+						float smoothTime = 0.15f;
 			
-			// zoom phase
-			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
+						// zoom phase
+						Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 
-			// open phase
-			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
-			{
-				Application.LoadLevel ("blacksmithScene");
-			}
-		} 
-		else if (isMedicalCenterClicked) 
-		{
-			// current camera depth
-			float current = Camera.main.camera.orthographicSize;
-			// hardcoded target depth
-			float target = 0.05f;
-			// 0.0 for default
-			float currentVelocity = 0.0f;
-			// 0.15 for default
-			float smoothTime = 0.15f;
+						// open phase
+						if (Camera.main.camera.orthographicSize <= (target + 0.01f)) {
+								Application.LoadLevel ("blacksmithScene");
+						}
+				} else if (isMedicalCenterClicked) {
+						// current camera depth
+						float current = Camera.main.camera.orthographicSize;
+						// hardcoded target depth
+						float target = 0.05f;
+						// 0.0 for default
+						float currentVelocity = 0.0f;
+						// 0.15 for default
+						float smoothTime = 0.15f;
 			
-			// zoom phase
-			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
+						// zoom phase
+						Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 			
-			// open phase
-			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
-			{
-				Application.LoadLevel ("medicalCenterScene");
-			}
-		}
-		else if (isTrainingCenterClicked) 
-		{
-			// current camera depth
-			float current = Camera.main.camera.orthographicSize;
-			// hardcoded target depth
-			float target = 0.05f;
-			// 0.0 for default
-			float currentVelocity = 0.0f;
-			// 0.15 for default
-			float smoothTime = 0.15f;
+						// open phase
+						if (Camera.main.camera.orthographicSize <= (target + 0.01f)) {
+								Application.LoadLevel ("medicalCenterScene");
+						}
+				} else if (isTrainingCenterClicked) {
+						// current camera depth
+						float current = Camera.main.camera.orthographicSize;
+						// hardcoded target depth
+						float target = 0.05f;
+						// 0.0 for default
+						float currentVelocity = 0.0f;
+						// 0.15 for default
+						float smoothTime = 0.15f;
 			
-			// zoom phase
-			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
+						// zoom phase
+						Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 			
-			// open phase
-			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
-			{
-				Application.LoadLevel ("trainingCenterScene");
-			}
-		}
-		else if (isCarpenterClicked) 
-		{
-			// current camera depth
-			float current = Camera.main.camera.orthographicSize;
-			// hardcoded target depth
-			float target = 0.05f;
-			// 0.0 for default
-			float currentVelocity = 0.0f;
-			// 0.15 for default
-			float smoothTime = 0.15f;
+						// open phase
+						if (Camera.main.camera.orthographicSize <= (target + 0.01f)) {
+								Application.LoadLevel ("trainingCenterScene");
+						}
+				} else if (isCarpenterClicked) {
+						// current camera depth
+						float current = Camera.main.camera.orthographicSize;
+						// hardcoded target depth
+						float target = 0.05f;
+						// 0.0 for default
+						float currentVelocity = 0.0f;
+						// 0.15 for default
+						float smoothTime = 0.15f;
 			
-			// zoom phase
-			Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
+						// zoom phase
+						Camera.main.camera.orthographicSize = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 			
-			// open phase
-			if (Camera.main.camera.orthographicSize <= (target+0.01f)) 
-			{
-				Application.LoadLevel ("carpenterScene");
-			}
-		}
-		else if (isMissionsClicked) 
-		{
-			if(btnMissions.transform.rotation.eulerAngles.z <= 89) 
-			{
-				btnMissions.transform.Rotate(new Vector3(currentRotation.x,currentRotation.y,90)*Time.deltaTime);
-			}
-			else
-			{
-				Vector3 currentPosition = btnMissions.transform.position;
-				Vector3 currentScale = btnMissions.transform.localScale;
-				Vector3 target = new Vector3(1.5f, 0.0f, currentPosition.z);
-				Vector3 velocity = new Vector3(0.0f, 0.0f, 0.0f);
-				float currentVelocity = 0.0f;
-				float smoothTime = 0.2f;
+						// open phase
+						if (Camera.main.camera.orthographicSize <= (target + 0.01f)) {
+								Application.LoadLevel ("carpenterScene");
+						}
+				} else if (isMissionsClicked) {
+						if (btnMissions.transform.rotation.eulerAngles.z <= 89) {
+								btnMissions.transform.Rotate (new Vector3 (currentRotation.x, currentRotation.y, 90) * Time.deltaTime);
+						} else {
+								Vector3 currentPosition = btnMissions.transform.position;
+								Vector3 currentScale = btnMissions.transform.localScale;
+								Vector3 target = new Vector3 (1.5f, 0.0f, currentPosition.z);
+								Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+								float currentVelocity = 0.0f;
+								float smoothTime = 0.2f;
 
-				btnMissions.transform.position = Vector3.SmoothDamp(currentPosition, target, ref velocity, smoothTime);
+								btnMissions.transform.position = Vector3.SmoothDamp (currentPosition, target, ref velocity, smoothTime);
 
-				Debug.Log("x: " + btnMissions.transform.position.x);
+								Debug.Log ("x: " + btnMissions.transform.position.x);
 
-				if((btnMissions.transform.position.x >= 1.49f) && 
-					(btnMissions.transform.position.y >= (-0.01f)))
-				{
+								if ((btnMissions.transform.position.x >= 1.49f) && 
+										(btnMissions.transform.position.y >= (-0.01f))) {
 
-					target = new Vector3(3.0f, 0.9f, currentPosition.z);
+										target = new Vector3 (3.0f, 0.9f, currentPosition.z);
 
-					btnMissions.transform.localScale = Vector3.SmoothDamp(currentScale, target, ref velocity, smoothTime);
+										btnMissions.transform.localScale = Vector3.SmoothDamp (currentScale, target, ref velocity, smoothTime);
 
-					if((btnMissions.transform.localScale.x >= 2.99f) &&
-					   (btnMissions.transform.localScale.y >= 0.89f))
-					{
-						isMissionsClicked = false;
-					}
-				}
-			}
-		}
-		else if (isSaveGameClicked)
-		{
-			isSaveGameClicked = false;
-			Debug.Log ("Save Game");
-			/*
-			if(UnityEditor.EditorUtility.DisplayDialog("Game Over", "Again?", "Restart", "Exit")){
-				Debug.Log ("Yes");
-				isSaveGameClicked = false;
-			}else{
-				Debug.Log ("No");
-				isSaveGameClicked = false;
-			}
-			*/
-			// TODO Salvar as configuraçoes atuais do jogo
+										if ((btnMissions.transform.localScale.x >= 2.99f) &&
+												(btnMissions.transform.localScale.y >= 0.89f)) {
+												isMissionsClicked = false;
+										}
+								}
+						}
+				} else if (isSaveGameClicked) {
+						isSaveGameClicked = false;
+						Debug.Log ("Save Game");
+						/*
+						if(UnityEditor.EditorUtility.DisplayDialog("Game Over", "Again?", "Restart", "Exit")){
+							Debug.Log ("Yes");
+							isSaveGameClicked = false;
+						}else{
+							Debug.Log ("No");
+							isSaveGameClicked = false;
+						}
+						*/
+						// TODO Salvar as configuraçoes atuais do jogo
+		} else if (isTarget1Clicked){
+			Application.LoadLevel ("mission1Scene");
 		}
 	}
 
@@ -198,5 +191,14 @@ public class scriptMainScene : MonoBehaviour {
 	void OnSaveGameClicked()
 	{
 		isSaveGameClicked = true;
+	}
+
+	void OnTarget1Clicked()
+	{
+		if (EditorUtility.DisplayDialog ("Start Mission 1", //title
+		                            "Are you sure you want to start the Mission 1?", // text
+		                            "OK", "Cancel")) { // yes, no
+						isTarget1Clicked = true;
+				}
 	}
 }

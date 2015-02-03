@@ -24,7 +24,7 @@ public class SlidingText : MonoBehaviour {
 		//float smoothTime = 8.0f;
 		float smoothTime = 13.5f;
 
-		// sliding phase phase
+		// sliding phase
 		Vector3 temp = gameObject.transform.position;
 		temp.y = Mathf.SmoothDamp (current, target, ref currentVelocity, smoothTime);
 		gameObject.transform.position = temp;
@@ -32,7 +32,7 @@ public class SlidingText : MonoBehaviour {
 		// open phase
 
 		Debug.Log ("Label -> Y: " + gameObject.transform.position.y + "; Param -> Y: "+param.transform.position.y);
-		if (gameObject.transform.position.y >= param.transform.position.y) 
+		if (gameObject.transform.position.y >= param.transform.position.y || Input.GetKeyDown(KeyCode.Escape)) 
 		{
 			Application.LoadLevel ("mainScene");
 		}

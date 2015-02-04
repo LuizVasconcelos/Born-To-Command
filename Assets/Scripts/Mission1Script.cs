@@ -89,7 +89,10 @@ public class Mission1Script : MonoBehaviour {
 			if(village3Clicked ){
 				if(step2){
 					GameObject nextLabel = FindClosestLabel(ROUTE_VILLAGE_TO_CASTLE);
-					personagem.transform.position = nextLabel.transform.position;
+
+					if(nextLabel != null){
+						personagem.transform.position = nextLabel.transform.position;
+					}
 				}else{
 					GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_VILLAGE);
 						
@@ -105,7 +108,10 @@ public class Mission1Script : MonoBehaviour {
 				// Direct route
 			}else{
 				GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_CASTLE);
-				personagem.transform.position = nextLabel.transform.position;
+
+				if(nextLabel != null){
+					personagem.transform.position = nextLabel.transform.position;
+				}
 			}
 			
 			/*RaycastHit hitInfo = new RaycastHit();

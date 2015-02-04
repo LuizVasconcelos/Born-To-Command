@@ -5,18 +5,31 @@ using UnityEditor;
 
 public class Mission1Script : MonoBehaviour {
 
+	// Players variables
+	private Player localPLayer;
+	private Troop villageTroops;
+	private Troop castleTroops;
+
+	// define routes
 	private readonly int ROUTE_CAMP_TO_VILLAGE = 1;
 	private readonly int ROUTE_VILLAGE_TO_CASTLE = 2;
 	private readonly int ROUTE_CAMP_TO_CASTLE = 3;
+	// define village choices
+	private readonly int ATTACK_VILLAGE = 4;
+	private readonly int PAY_VILLAGE = 5;
 
 	private int index;
 	private bool village3Clicked;
 	private bool castleClicked;
 	private float startTime;
 	private bool step2;
+	private bool justarrived;
 
 	// Action buttons
 	private bool isGoClicked;
+
+	// Actions
+	private int villageChoice;
 
 	// Use this for initialization
 	void Start () {
@@ -26,6 +39,11 @@ public class Mission1Script : MonoBehaviour {
 
 		isGoClicked = false;
 		step2 = false;
+		villageChoice = 0;
+
+		localPLayer = new Player (1570, 12, generateTroop(112), 0, 1);
+		villageTroops = generateTroop (45);
+		castleTroops = generateTroop (60);
 	}
 	
 	// Update is called once per frame
@@ -101,6 +119,11 @@ public class Mission1Script : MonoBehaviour {
 						step2 = true;
 
 						// Here starts the village script per se
+						villageChoice();
+
+						// We halt the GO during the combat
+						isGoClicked = false;
+					
 					}else{
 						personagem.transform.position = nextLabel.transform.position;
 					}
@@ -113,28 +136,16 @@ public class Mission1Script : MonoBehaviour {
 					personagem.transform.position = nextLabel.transform.position;
 				}
 			}
-			
-			/*RaycastHit hitInfo = new RaycastHit();
-			GameObject personagem = GameObject.Find ("Personagem");
-			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
-			if (hit){
-				Debug.Log("Hit " + hitInfo.transform.gameObject.name);
-				if (hitInfo.transform.gameObject.name == "Castle-obj" || 
-				    hitInfo.transform.gameObject.name == "Village1-obj" || 
-				    hitInfo.transform.gameObject.name == "Village2-obj" ||
-				    hitInfo.transform.gameObject.name == "Village3-obj" ||
-				    hitInfo.transform.gameObject.name == "Campfire-obj"){
-					Debug.Log ("It's working!");
-					Vector3 clickedPosition = hitInfo.point;
-					personagem.transform.position = Vector3.Lerp(personagem.transform.position, clickedPosition, (Time.time - startTime) / 1.0f);
-					
-				} else {
-					Debug.Log ("nopz");
-					Debug.Log ("TAG: " + hitInfo.transform.gameObject.tag);
-				}
-			} else {
-				Debug.Log("No hit");
-			}*/
+		}
+		/*********************************************************************/
+
+		/**************************** PHASE 3 ********************************/
+		if (villageChoice > 0) {
+			if(villageChoice == ATTACK_VILLAGE){
+
+			}else if(villageChoice == PAY_VILLAGE){
+
+			}
 		}
 		/*********************************************************************/
 	}
@@ -151,13 +162,13 @@ public class Mission1Script : MonoBehaviour {
 		if (!castleClicked) {
 			if (EditorUtility.DisplayDialog ("No route selected!", //title
 			                                 "You must select a route to siege the castle.\n" +
-			                                 "You can either go through the jungle village ou direct to the castle", // text
+			                                 "You can either go through the forest village ou direct to the castle", // text
 			                                 "OK")) { // yes, no
 				//isGoClicked = true;
 			}
 		} else {
 			string info = "";
-			if(village3Clicked) info = "Hint: The people of the jungle village might be dangerous.";
+			if(village3Clicked) info = "Hint: The forest folk might be dangerous.";
 			else info = "Hint: Going directly might exhaust your resources on the journey.";
 			if (EditorUtility.DisplayDialog ("March to Battle!", //title
 			                                 "Are you sure you want to follow this route to battle?\n"+info, // text
@@ -210,4 +221,59 @@ public class Mission1Script : MonoBehaviour {
 		
 		return closest;
 	}
+
+	/***************************** Village Script ***************************/
+	void villageChoice(){
+		if (EditorUtility.DisplayDialog ("You arrived at the forest village", //title
+		                                 "People from the village are not allied of your reign and seem a bit hostile.\n" +
+		                                 "They don't have enough weaponry and a combat would favor your army.\n" +
+		                                 "You can either plunder the village or offer them gold for your stay.", // text
+		                                 "Attack", "Pay")) { // yes, no
+			villageChoice = ATTACK_VILLAGE;
+		}else{
+			villageChoice = PAY_VILLAGE;
+		}
+	}
+	/************************************************************************/
+
+	/*************************** Combat Script ******************************/
+	Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, float odds){
+		// Number of units in combat per turn
+		int garther = 6;
+		int alliedPortion = Mathf.Ceil (garther * odds);
+		int enemyPortion = Mathf.Floor (garther * (1-odds));
+
+		// Allies damage enemies
+		for (int i = 0; i<alliedPortion; i++) {
+			enemyTroops = damage(enemyTroops, alliedTroops.Units[i].Attack, enemyPortion);
+		}
+
+		/// Enemies damage allies
+		for (int i = 0; i<enemyPortion; i++) {
+			alliedTroops = damage(alliedTroops, enemyTroops.Units[i].Attack, alliedPortion);
+		}
+
+		return new Tuple<alliedTroops, enemyTroops>();
+	}
+
+	Troop damage(Troop defender, int damage, int ammount){
+		for (int i = 0; i<Mathf.Min(ammount,defender.Units.Capacity); i++) {
+			defender.Units[i].Heath -=  damage*defender.Units[i].Armor;
+			if(defender.Units[i].Heath < 0){
+				defender.Units.RemoveAt(i);
+			}
+		}
+		return defender;
+	}
+
+	// Dummy function
+	Troop generateTroop(int size){
+		Troop units = new Troop (new Unit[size]);
+		for (int i = 0; i<size; i++) {
+			units.Units[i] = new Unit("",Random.Range(90, 100),Random.Range(1, 30),Random.Range(0.0f, 4.0f));
+		}
+
+		return units;
+	}
+	/************************************************************************/
 }

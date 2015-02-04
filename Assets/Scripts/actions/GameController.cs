@@ -15,30 +15,11 @@ public class GameController {
 	string path = Application.persistentDataPath + "/PlayerData.xml";
 	string filename = Application.persistentDataPath + "/PlayerData";
 
-	void Awake(){
-		SaveGame(0);
-		Player player = LoadGame(0);
-
-		// Testing reading file
-		Debug.Log ("Health: " + player.Health + " Level: " + player.Level);
-		string aux = "";
-		foreach (Test t in player.Lista){
-			aux += t.AtributoTeste + " ";
-		}
-		Debug.Log ("Lista: " + aux);
-	}
-
 	// Writing data to file PlayerData.xml
-	public void SaveGame(int gameNumber){
+	public void SaveGame(int gameNumber, Player player){
 		XmlSerializer xmls = new XmlSerializer(typeof(Player));
 		using (var stream = File.OpenWrite(filename + gameNumber + ".xml")){
-			List<Test> list = new List<Test>();
-			list.Add(new Test(2));
-			list.Add (new Test(3));
-			list.Add (new Test(4));
-			list.Add (new Test(5));
-			list.Add (new Test(6));
-			xmls.Serialize(stream, new Player { Level = 5, Health = 500, Lista = list });
+			xmls.Serialize(stream, player);
 		}
 		Debug.Log (path);
 	}
@@ -56,18 +37,55 @@ public class GameController {
 
 }
 
+public class Unit
+{
+	public Unit(string Type, int Health, int Attack, float Armor){
+		this.Type = Type;
+		this.Heath = Heath;
+		this.Attack = Attack;
+		this.Armor = Armor;
+	}
+
+	public string Type { get; set; }
+	public int Heath { get; set; }
+	public int Attack { get; set; }
+	public float Armor { get; set; }
+}
+
+public class Troop
+{
+	public Troop (List<Unit> Units){
+		this.Units = Units;
+	}
+
+	public List<Unit> Units { get; set; }
+}
+
 [XmlRoot]
 public class Player
 {
+	public Player (int Gold, int Food, Troop Units, int Moral, int Travelling){
+		this.Gold = Gold;
+		this.Food = Food;
+		this.Units = Units;
+		this.Moral = Moral;
+		this.Travelling = Travelling;
+	}
+
 	[XmlElement]
-	public int Level { get; set; }
+	public int Gold { get; set; }
 	
 	[XmlElement]
-	public int Health { get; set; }
+	public int Food { get; set; }
 	
-	[XmlArray("Lista")]
-	[XmlArrayItem("test")]
-	public List<Test> Lista;
+	[XmlElement]
+	public Troop Units { get; set; }
+	
+	[XmlElement]
+	public int Moral { get; set; }
+	
+	[XmlElement]
+	public int Travelling { get; set; }
 }
 
 
@@ -80,5 +98,16 @@ public class Test{
 	}
 	// This empty construtor is mandatory
 	public Test(){}
+}
+
+public class Tuple<T1, T2>
+{
+	public T1 First { get; private set; }
+	public T2 Second { get; private set; }
+	internal Tuple(T1 first, T2 second)
+	{
+		First = first;
+		Second = second;
+	}
 }
 

@@ -21,13 +21,17 @@ public class Mission1Script : MonoBehaviour {
 		}
 		if(Input.GetMouseButtonDown(0)){
 
-			Debug.Log("Mouse is down");
+			//Debug.Log("Mouse is down");
 			
 			RaycastHit hitInfo = new RaycastHit();
 			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
 			if (hit){
 				Debug.Log("Hit " + hitInfo.transform.gameObject.name);
-				if (hitInfo.transform.gameObject.name == "Castle-obj"){
+				if (hitInfo.transform.gameObject.name == "Castle-obj" || 
+				    hitInfo.transform.gameObject.name == "Village1-obj" || 
+				    hitInfo.transform.gameObject.name == "Village2-obj" ||
+				    hitInfo.transform.gameObject.name == "Village3-obj" ||
+				    hitInfo.transform.gameObject.name == "Campfire-obj"){
 					Debug.Log ("It's working!");
 				} else {
 					Debug.Log ("nopz");

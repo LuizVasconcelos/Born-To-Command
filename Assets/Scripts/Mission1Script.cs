@@ -5,10 +5,15 @@ using UnityEditor;
 
 public class Mission1Script : MonoBehaviour {
 
+	private readonly int ROUTE_CAMP_TO_VILLAGE = 1;
+	private readonly int ROUTE_VILLAGE_TO_CASTLE = 2;
+	private readonly int ROUTE_CAMP_TO_CASTLE = 3;
+
 	private int index;
 	private bool village3Clicked;
 	private bool castleClicked;
 	private float startTime;
+	private bool step2;
 
 	// Action buttons
 	private bool isGoClicked;
@@ -20,6 +25,7 @@ public class Mission1Script : MonoBehaviour {
 		startTime = Time.time;
 
 		isGoClicked = false;
+		step2 = false;
 	}
 	
 	// Update is called once per frame
@@ -30,14 +36,14 @@ public class Mission1Script : MonoBehaviour {
 		// Lines exposition
 		if (village3Clicked && index >= 0) {
 			if(castleClicked){
-				show (index,2);
+				show (index,ROUTE_VILLAGE_TO_CASTLE);
 				index--;
 			}else{
-				show (index,1);
+				show (index,ROUTE_CAMP_TO_VILLAGE);
 				index--;
 			}
 		}else if(castleClicked && index >= 0){
-			show (index,3);
+			show (index,ROUTE_CAMP_TO_CASTLE);
 			index--;
 		}
 
@@ -76,8 +82,33 @@ public class Mission1Script : MonoBehaviour {
 
 		/**************************** PHASE 2 ********************************/
 		if(isGoClicked){
+			// Check desired route
+			GameObject personagem = GameObject.Find ("Personagem");
 			
-			RaycastHit hitInfo = new RaycastHit();
+			// Indirect route
+			if(village3Clicked ){
+				if(step2){
+					GameObject nextLabel = FindClosestLabel(ROUTE_VILLAGE_TO_CASTLE);
+					personagem.transform.position = nextLabel.transform.position;
+				}else{
+					GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_VILLAGE);
+						
+					// no more labels in this route
+					if(nextLabel == null){
+						step2 = true;
+
+						// Here starts the village script per se
+					}else{
+						personagem.transform.position = nextLabel.transform.position;
+					}
+				}
+				// Direct route
+			}else{
+				GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_CASTLE);
+				personagem.transform.position = nextLabel.transform.position;
+			}
+			
+			/*RaycastHit hitInfo = new RaycastHit();
 			GameObject personagem = GameObject.Find ("Personagem");
 			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
 			if (hit){
@@ -97,7 +128,7 @@ public class Mission1Script : MonoBehaviour {
 				}
 			} else {
 				Debug.Log("No hit");
-			}
+			}*/
 		}
 		/*********************************************************************/
 	}
@@ -111,10 +142,22 @@ public class Mission1Script : MonoBehaviour {
 	}
 
 	void OnGoClicked(){
-		if (EditorUtility.DisplayDialog ("March to Battle!", //title
-		                                 "Are you sure you want to follow this route to battle?", // text
-		                                 "Yes", "No")) { // yes, no
-			isGoClicked = true;
+		if (!castleClicked) {
+			if (EditorUtility.DisplayDialog ("No route selected!", //title
+			                                 "You must select a route to siege the castle.\n" +
+			                                 "You can either go through the jungle village ou direct to the castle", // text
+			                                 "OK")) { // yes, no
+				//isGoClicked = true;
+			}
+		} else {
+			string info = "";
+			if(village3Clicked) info = "Hint: The people of the jungle village might be dangerous.";
+			else info = "Hint: Going directly might exhaust your resources on the journey.";
+			if (EditorUtility.DisplayDialog ("March to Battle!", //title
+			                                 "Are you sure you want to follow this route to battle?\n"+info, // text
+			                                 "Yes", "No")) { // yes, no
+				isGoClicked = true;
+			}
 		}
 	}
 
@@ -146,11 +189,19 @@ public class Mission1Script : MonoBehaviour {
 		foreach (GameObject go in gos) {
 			Vector3 diff = go.transform.position - position;
 			float curDistance = diff.sqrMagnitude;
-			if (curDistance < distance) {
+			if (curDistance < distance && go.transform.localScale.x == 28f) {
 				closest = go;
 				distance = curDistance;
 			}
 		}
+
+		// Marking as visited (BEWARE: NOT SAFE)
+		if (closest != null) {
+				Vector3 scale = closest.transform.localScale;
+				scale.x = 27f;
+				closest.transform.localScale = scale;		
+		}
+		
 		return closest;
 	}
 }

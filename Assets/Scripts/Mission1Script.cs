@@ -19,6 +19,24 @@ public class Mission1Script : MonoBehaviour {
 			show (index);
 			index--;
 		}
+		if(Input.GetMouseButtonDown(0)){
+
+			Debug.Log("Mouse is down");
+			
+			RaycastHit hitInfo = new RaycastHit();
+			bool hit = Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hitInfo);
+			if (hit){
+				Debug.Log("Hit " + hitInfo.transform.gameObject.name);
+				if (hitInfo.transform.gameObject.name == "Castle-obj"){
+					Debug.Log ("It's working!");
+				} else {
+					Debug.Log ("nopz");
+					Debug.Log ("TAG: " + hitInfo.transform.gameObject.tag);
+				}
+			} else {
+				Debug.Log("No hit");
+			}
+		}
 	}
 
 	void show(int idx){

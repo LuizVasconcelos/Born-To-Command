@@ -54,11 +54,13 @@ public class Unit
 
 public class Troop
 {
-	public Troop (List<Unit> Units){
+	public Troop (List<Unit> Units, int Deaths = 0){
 		this.Units = Units;
+		this.Deaths = Deaths;
 	}
 
 	public List<Unit> Units { get; set; }
+	public int Deaths { get; set; }
 }
 
 [XmlRoot]

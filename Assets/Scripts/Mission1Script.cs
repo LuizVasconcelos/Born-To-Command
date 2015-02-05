@@ -30,6 +30,7 @@ public class Mission1Script : MonoBehaviour {
 	private bool justarrived;
 	private Vector3 target;
 	private bool halt;
+	private int labelsCrossed;
 
 	// Action buttons
 	private bool isGoClicked;
@@ -49,17 +50,22 @@ public class Mission1Script : MonoBehaviour {
 		villageChoice = 0;
 		castleChoice = 0;
 
-		localPLayer = new Player (1570, 12, generateTroop(3), 0, 1);
-		villageTroops = generateTroop (2);
+		localPLayer = new Player (1570, 12, generateTroop(50), 0, 0);
+		villageTroops = generateTroop (30);
 		castleTroops = generateTroop (60);
 
 		target = GameObject.Find ("Personagem").transform.position;
 		halt = true;
 
+		labelsCrossed = 0;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+
+		// Update log and status text
+		updateStatus ();
+		updateLog ();
 
 		/**************************** PHASE 1 ********************************/
 
@@ -92,6 +98,7 @@ public class Mission1Script : MonoBehaviour {
 					index = GameObject.FindGameObjectsWithTag("Route-1").Length-1;
 				// Clicked the castle
 				} else if(hitInfo.transform.gameObject.name == "Castle-obj"){
+					updateStatus();
 					castleClicked = true;
 
 					// Indirect route
@@ -159,7 +166,10 @@ public class Mission1Script : MonoBehaviour {
 		/**************************** PHASE 3 ********************************/
 		if (villageChoice > 0) {
 			if(villageChoice == ATTACK_VILLAGE){
-				Tuple<Troop, Troop> result = combatTurn(localPLayer.Units,villageTroops,0.5f);
+				int total = localPLayer.Units.Units.Count+villageTroops.Units.Count;
+				float odds = (float)localPLayer.Units.Units.Count/(float)total;
+				//Debug.Log("total::odds = "+total+"::"+odds);
+				Tuple<Troop, Troop> result = combatTurn(localPLayer.Units,villageTroops,odds);
 				localPLayer.Units = result.First;
 				villageTroops = result.Second;
 
@@ -195,6 +205,61 @@ public class Mission1Script : MonoBehaviour {
 	/************************* AUXILIAR FUNCTIONS ************************/
 	/*********************************************************************/
 
+	void updateLog(){
+		GameObject log = GameObject.Find ("Log");
+		UILabel content = log.GetComponent<UILabel> ();
+
+		int swordmans = 0, knights = 0, archers = 0, wounded = 0;
+		int dead = localPLayer.Units.Deaths;
+
+		for (int i = 0; i<localPLayer.Units.Units.Count; i++) {
+			if(localPLayer.Units.Units[i].Type.Equals("Swordman")){
+				swordmans++;
+			}else if(localPLayer.Units.Units[i].Type.Equals("Knight")){
+				knights++;
+			}else if(localPLayer.Units.Units[i].Type.Equals("Archer")){
+				archers++;
+			}
+
+			if(localPLayer.Units.Units[i].Health < 100){
+				wounded++;
+			}
+		}
+
+		content.text = "Combat log\n\n"+
+						"Swordmans: "+swordmans+"\n"+
+						"Knights: "+knights+"\n"+
+						"Archers: "+archers+"\n\n"+
+						"Dead soldiers: "+dead+"\n"+
+						"Wounded soldiers: "+wounded+"\n"+
+						"Forest folk: "+villageTroops.Units.Count+"\n"+
+						"Dead villagers: "+villageTroops.Deaths;
+	}
+
+	void updateStatus(){
+		GameObject status = GameObject.Find ("Status");
+		UILabel content = status.GetComponent<UILabel> ();
+
+		string moral = "";
+		if (localPLayer.Moral == 0) {
+			moral = "stable";
+		}else if(localPLayer.Moral < 0 && localPLayer.Moral >= -50){
+			moral = "low";
+		}
+		else if(localPLayer.Moral > 0 && localPLayer.Moral <= 50){
+			moral = "graceful";
+		}else if(localPLayer.Moral < -50){
+			moral = "critical";
+		}else if(localPLayer.Moral > 50){
+			moral = "untouchable";
+		}
+
+		content.text = "Gold: "+localPLayer.Gold+"g\n"+
+					   	"Food: "+(localPLayer.Food-localPLayer.Travelling)+" day(s) worth\n"+
+						"Troop's moral: "+moral+"\n"+
+						"Days traveling: "+localPLayer.Travelling+" day";
+	}
+
 	bool moveTo(int route){
 		GameObject personagem = GameObject.Find ("Personagem");
 		bool stopped = false;
@@ -215,6 +280,14 @@ public class Mission1Script : MonoBehaviour {
 			// Get another label
 			GameObject nextLabel = FindClosestLabel(route);
 			if(nextLabel != null){
+
+				// Each 3 labels crossed = 1 day of journey
+				labelsCrossed++;
+				if(labelsCrossed == 3){
+					labelsCrossed = 0;
+					localPLayer.Travelling++;
+				}
+
 				target = new Vector3(nextLabel.transform.position.x,
 				                     nextLabel.transform.position.y,
 				                     personagem.transform.position.z);
@@ -336,21 +409,23 @@ public class Mission1Script : MonoBehaviour {
 	/*************************** Combat Script ******************************/
 	Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, float odds){
 		// Number of units in combat per turn
-		int garther = 2;
-		int alliedPortion = Mathf.CeilToInt (garther * odds);
-		int enemyPortion = Mathf.FloorToInt (garther * (1-odds));
+		int garther = 20;
+		float alliedOdds = garther * odds;
+		float enemyOdds = garther * (1-odds);
+		int alliedPortion = Mathf.Min(Mathf.CeilToInt (alliedOdds),19);
+		int enemyPortion = Mathf.Max(Mathf.FloorToInt (enemyOdds),1);
 
 		// Allies damage enemies
-		Debug.Log("PLAYER PHASE");
+		Debug.Log("PLAYER PHASE ("+alliedPortion+")");
 		for (int i = 0; i<alliedPortion; i++) {
-			enemyTroops = damage(enemyTroops, alliedTroops.Units[i].Attack, enemyPortion);
+			enemyTroops = damage(enemyTroops, alliedTroops.Units[i].Attack, alliedPortion);
 		}
 
 		if (enemyTroops.Units.Count > 0) {
-			Debug.Log("ENEMY PHASE");
+			Debug.Log("ENEMY PHASE ("+enemyPortion+")");
 			/// Enemies damage allies
 			for (int i = 0; i<enemyPortion; i++) {
-				alliedTroops = damage(alliedTroops, enemyTroops.Units[i].Attack, alliedPortion);
+				alliedTroops = damage(alliedTroops, enemyTroops.Units[i].Attack, enemyPortion);
 			}
 		}
 
@@ -361,12 +436,13 @@ public class Mission1Script : MonoBehaviour {
 		for (int i = 0; i<Mathf.Min(ammount,defender.Units.Count); i++) {
 			int damageDealt = (int) (damage*defender.Units[i].Armor);
 
-			Debug.Log("A unit dealt "+damageDealt+" damage!\n" +
+			Debug.Log("A unit dealt "+damageDealt+"("+damage+"*"+defender.Units[i].Armor+") damage!\n" +
 			          "Health: "+defender.Units[i].Health+"->"+(defender.Units[i].Health - damageDealt));
 
 			defender.Units[i].Health -=  damageDealt;
 			if(defender.Units[i].Health <= 0){
 				defender.Units.RemoveAt(i);
+				defender.Deaths += 1;
 			}
 		}
 		return defender;
@@ -376,7 +452,7 @@ public class Mission1Script : MonoBehaviour {
 	Troop generateTroop(int size){
 		Troop units = new Troop (new List<Unit>(size));
 		for (int i = 0; i<size; i++) {
-			Unit u = new Unit("",Random.Range(90, 100),Random.Range(10, 30),Random.Range(0.0f, 0.4f));
+			Unit u = new Unit("Swordman",100,Random.Range(15, 70),Random.Range(0.0f, 0.4f));
 			/*Debug.Log("Unit:: \n" +
 				"Health: "+u.Health+"\n" +
 			    "Attack: "+u.Attack+"\n" +

@@ -50,7 +50,7 @@ public class Mission1Script : MonoBehaviour {
 		villageChoice = 0;
 		castleChoice = 0;
 
-		localPLayer = new Player (1570, 12, generateTroop(50), 0, 0);
+		localPLayer = new Player (1570, 6, generateTroop(50), 0, 0);
 		villageTroops = generateTroop (30);
 		castleTroops = generateTroop (60);
 
@@ -184,10 +184,14 @@ public class Mission1Script : MonoBehaviour {
 					// Win :)	
 
 					isGoClicked = true;
+					localPLayer.Food += 6;
+					localPLayer.Gold += 500;
 					villageChoice = 0;
 				}
 			}else if(villageChoice == PAY_VILLAGE){
 				isGoClicked = true;
+				localPLayer.Food += 4;
+				localPLayer.Gold -= 1000;
 				villageChoice = 0;
 			}
 		}
@@ -205,6 +209,18 @@ public class Mission1Script : MonoBehaviour {
 	/************************* AUXILIAR FUNCTIONS ************************/
 	/*********************************************************************/
 
+	void starving(){
+		int score = localPLayer.Food - localPLayer.Travelling;
+		if (score < 0) {
+			score = Mathf.Abs(score);
+			// Soldiers die due to starvation
+			for(int i = 1; i< Mathf.Min(score*2,localPLayer.Units.Units.Count); i++){
+				localPLayer.Units.Units.RemoveAt(i);
+				localPLayer.Units.Deaths++;
+			}
+		}
+	}
+
 	void updateLog(){
 		GameObject log = GameObject.Find ("Log");
 		UILabel content = log.GetComponent<UILabel> ();
@@ -213,11 +229,11 @@ public class Mission1Script : MonoBehaviour {
 		int dead = localPLayer.Units.Deaths;
 
 		for (int i = 0; i<localPLayer.Units.Units.Count; i++) {
-			if(localPLayer.Units.Units[i].Type.Equals("Swordman")){
+			if(localPLayer.Units.Units[i].Type.Equals(Unit.SWORDMAN)){
 				swordmans++;
-			}else if(localPLayer.Units.Units[i].Type.Equals("Knight")){
+			}else if(localPLayer.Units.Units[i].Type.Equals(Unit.KNIGHT)){
 				knights++;
-			}else if(localPLayer.Units.Units[i].Type.Equals("Archer")){
+			}else if(localPLayer.Units.Units[i].Type.Equals(Unit.ARCHER)){
 				archers++;
 			}
 
@@ -226,14 +242,16 @@ public class Mission1Script : MonoBehaviour {
 			}
 		}
 
-		content.text = "Combat log\n\n"+
-						"Swordmans: "+swordmans+"\n"+
-						"Knights: "+knights+"\n"+
-						"Archers: "+archers+"\n\n"+
-						"Dead soldiers: "+dead+"\n"+
-						"Wounded soldiers: "+wounded+"\n"+
-						"Forest folk: "+villageTroops.Units.Count+"\n"+
-						"Dead villagers: "+villageTroops.Deaths;
+		content.text = "Combat log\n\n" +
+						"Swordmans: " + swordmans + "\n" +
+						"Knights: " + knights + "\n" +
+						"Archers: " + archers + "\n\n" +
+						"Dead soldiers: " + dead + "\n" +
+						"Wounded soldiers: " + wounded + "\n";
+						
+						// For debug only
+						//"Forest folk: "+villageTroops.Units.Count+"\n"+
+						//"Dead villagers: "+villageTroops.Deaths;
 	}
 
 	void updateStatus(){
@@ -255,7 +273,7 @@ public class Mission1Script : MonoBehaviour {
 		}
 
 		content.text = "Gold: "+localPLayer.Gold+"g\n"+
-					   	"Food: "+(localPLayer.Food-localPLayer.Travelling)+" day(s) worth\n"+
+					   	"Food: "+Mathf.Max((localPLayer.Food-localPLayer.Travelling),0)+" day(s) worth\n"+
 						"Troop's moral: "+moral+"\n"+
 						"Days traveling: "+localPLayer.Travelling+" day";
 	}
@@ -286,6 +304,7 @@ public class Mission1Script : MonoBehaviour {
 				if(labelsCrossed == 3){
 					labelsCrossed = 0;
 					localPLayer.Travelling++;
+					starving();
 				}
 
 				target = new Vector3(nextLabel.transform.position.x,
@@ -384,7 +403,7 @@ public class Mission1Script : MonoBehaviour {
 		                                 "People from the village are not allied of your reign and seem a bit hostile.\n" +
 		                                 "They don't have enough weaponry and a combat would favor your army.\n" +
 		                                 "You can either plunder the village or offer them gold for your stay.", // text
-		                                 "Attack", "Pay")) { // yes, no
+		                                 "Attack", "Pay 1000g")) { // yes, no
 			villageChoice = ATTACK_VILLAGE;
 		}else{
 			villageChoice = PAY_VILLAGE;
@@ -418,41 +437,70 @@ public class Mission1Script : MonoBehaviour {
 		// Allies damage enemies
 		Debug.Log("PLAYER PHASE ("+alliedPortion+")");
 		for (int i = 0; i<alliedPortion; i++) {
-			enemyTroops = damage(enemyTroops, alliedTroops.Units[i].Attack, alliedPortion);
+			enemyTroops = damage(enemyTroops, alliedTroops.Units[i], alliedPortion);
 		}
 
 		if (enemyTroops.Units.Count > 0) {
 			Debug.Log("ENEMY PHASE ("+enemyPortion+")");
 			/// Enemies damage allies
 			for (int i = 0; i<enemyPortion; i++) {
-				alliedTroops = damage(alliedTroops, enemyTroops.Units[i].Attack, enemyPortion);
+				alliedTroops = damage(alliedTroops, enemyTroops.Units[i], enemyPortion);
 			}
 		}
 
 		return new Tuple<Troop, Troop>(alliedTroops, enemyTroops);
 	}
 
-	Troop damage(Troop defender, int damage, int ammount){
-		for (int i = 0; i<Mathf.Min(ammount,defender.Units.Count); i++) {
-			int damageDealt = (int) (damage*defender.Units[i].Armor);
+	Troop damage(Troop defenders, Unit attacker, int ammount){
+		int damage = attacker.RollAttackDie ();
 
-			Debug.Log("A unit dealt "+damageDealt+"("+damage+"*"+defender.Units[i].Armor+") damage!\n" +
-			          "Health: "+defender.Units[i].Health+"->"+(defender.Units[i].Health - damageDealt));
+		for (int i = 0; i<Mathf.Min(ammount,defenders.Units.Count); i++) {
+			Unit defender = defenders.Units[i];
+			float rawDamage = damage*defender.Armor;
 
-			defender.Units[i].Health -=  damageDealt;
-			if(defender.Units[i].Health <= 0){
-				defender.Units.RemoveAt(i);
-				defender.Deaths += 1;
+			// Rock-paper-scisors bonuses
+			if(attacker.Type.Equals(Unit.KNIGHT) && defender.Type.Equals(Unit.SWORDMAN)){
+				rawDamage *= 1.3f;
+			}else if(attacker.Type.Equals(Unit.SWORDMAN) && defender.Type.Equals(Unit.ARCHER)){
+				rawDamage *= 1.25f;
+			}else if(attacker.Type.Equals(Unit.ARCHER) && defender.Type.Equals(Unit.KNIGHT)){
+				rawDamage *= 1.75f;
+			}
+
+			int damageDealt = Mathf.CeilToInt(rawDamage);
+
+			Debug.Log("A unit dealt "+damageDealt+"("+damage+"*"+defender.Armor+") damage!\n" +
+			          "Health: "+defender.Health+"->"+(defender.Health - damageDealt));
+
+			defender.Health -=  damageDealt;
+			if(defender.Health <= 0){
+				defenders.Units.RemoveAt(i);
+				defenders.Deaths += 1;
 			}
 		}
-		return defender;
+		return defenders;
 	}
 
 	// Dummy function
 	Troop generateTroop(int size){
 		Troop units = new Troop (new List<Unit>(size));
 		for (int i = 0; i<size; i++) {
-			Unit u = new Unit("Swordman",100,Random.Range(15, 70),Random.Range(0.0f, 0.4f));
+			int type = Random.Range(1,4);
+			Unit u = null;
+			switch(type){
+				case 1:
+					u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
+					break;
+				case 2:
+					u = new Unit(Unit.KNIGHT,100,2,35,0.35f);
+					break;
+				case 3:
+					u = new Unit(Unit.ARCHER,100,100,1,0.05f);
+					break;
+				default:
+					u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
+					break;
+			}
 			/*Debug.Log("Unit:: \n" +
 				"Health: "+u.Health+"\n" +
 			    "Attack: "+u.Attack+"\n" +

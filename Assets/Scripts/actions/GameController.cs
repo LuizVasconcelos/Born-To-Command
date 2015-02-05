@@ -39,16 +39,31 @@ public class GameController {
 
 public class Unit
 {
-	public Unit(string Type, int Health, int Attack, float Armor){
+
+	public Unit(string Type, int Health, int AttackDie, int NumDie, float Armor){
 		this.Type = Type;
 		this.Health = Health;
-		this.Attack = Attack;
+		this.AttackDie = AttackDie;
+		this.NumDie = NumDie;
 		this.Armor = Armor;
 	}
 
+	public int RollAttackDie(){
+		int result = 0;
+		for (int i = 1; i<this.NumDie; i++) {
+			result += Random.Range(1, this.AttackDie);
+		}
+		return result;
+	}
+
+	public const string SWORDMAN = "Swordman";
+	public const string KNIGHT = "Knight";
+	public const string ARCHER = "Archer";
+
 	public string Type { get; set; }
 	public int Health { get; set; }
-	public int Attack { get; set; }
+	public int AttackDie { get; set; }
+	public int NumDie { get; set; }
 	public float Armor { get; set; }
 }
 

@@ -19,6 +19,8 @@ public class scriptMainScene : MonoBehaviour {
 
 	private GameObject btnMissions;
 	private Vector3 currentRotation;
+	private GameObject scroll;
+	private bool openScroll;
 
 	private bool showMessage;
 
@@ -36,9 +38,14 @@ public class scriptMainScene : MonoBehaviour {
 		btnMissions = GameObject.Find ("btnMissions");
 		currentRotation = new Vector3(btnMissions.transform.rotation.x,btnMissions.transform.rotation.y,btnMissions.transform.rotation.z);
 
+		scroll = GameObject.Find("scroll");
+		openScroll = false;
+
 		btnTarget1 = GameObject.Find ("btnTarget1");
 
 		panel = GameObject.Find ("Panel");
+
+		scroll.SetActive(false);
 	}
 	
 	// Update is called once per frame
@@ -112,9 +119,14 @@ public class scriptMainScene : MonoBehaviour {
 								Application.LoadLevel ("carpenterScene");
 						}
 				} else if (isMissionsClicked) {
+
+						GameObject background = btnMissions.transform.FindChild("Background").gameObject;
+						if(background.activeSelf) background.SetActive(false);
+
 						if (btnMissions.transform.rotation.eulerAngles.z <= 89) {
 								btnMissions.transform.Rotate (new Vector3 (currentRotation.x, currentRotation.y, 90) * Time.deltaTime);
 						} else {
+							if(!openScroll) {
 								Vector3 currentPosition = btnMissions.transform.position;
 								Vector3 currentScale = btnMissions.transform.localScale;
 								Vector3 target = new Vector3 (1.5f, 0.0f, currentPosition.z);
@@ -135,9 +147,28 @@ public class scriptMainScene : MonoBehaviour {
 
 										if ((btnMissions.transform.localScale.x >= 2.99f) &&
 												(btnMissions.transform.localScale.y >= 0.89f)) {
-												isMissionsClicked = false;
+											btnMissions.SetActive(false);
+											scroll.SetActive(true);
+											openScroll = true;
 										}
 								}
+							}else {
+								GameObject leftSide = scroll.transform.FindChild("leftSide").gameObject;
+								GameObject middle = scroll.transform.FindChild("middle").gameObject;
+					
+								Vector3 currentPosition2 = leftSide.transform.position;
+								Vector3 target2 = new Vector3 ((-1.4f), leftSide.transform.position.y, leftSide.transform.position.z);
+								Vector3 velocity2 = new Vector3 (0.0f, 0.0f, 0.0f);
+								float currentVelocity2 = 0.0f;
+								float smoothTime2 = 0.1f;
+					
+								if(leftSide.transform.position.x > (-1.4f)) {
+									leftSide.transform.position = Vector3.SmoothDamp(currentPosition2, target2, ref velocity2, smoothTime2);
+						
+								}else {
+									isMissionsClicked = false;								
+								}
+							}
 						}
 				} else if (isSaveGameClicked) {
 						isSaveGameClicked = false;

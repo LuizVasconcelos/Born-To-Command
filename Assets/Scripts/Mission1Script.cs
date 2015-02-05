@@ -49,8 +49,8 @@ public class Mission1Script : MonoBehaviour {
 		villageChoice = 0;
 		castleChoice = 0;
 
-		localPLayer = new Player (1570, 12, generateTroop(112), 0, 1);
-		villageTroops = generateTroop (45);
+		localPLayer = new Player (1570, 12, generateTroop(3), 0, 1);
+		villageTroops = generateTroop (2);
 		castleTroops = generateTroop (60);
 
 		target = GameObject.Find ("Personagem").transform.position;
@@ -118,16 +118,20 @@ public class Mission1Script : MonoBehaviour {
 			// Indirect route
 			if(village3Clicked ){
 				if(step2){
-					GameObject nextLabel = FindClosestLabel(ROUTE_VILLAGE_TO_CASTLE);
+					bool stopped = moveTo (ROUTE_VILLAGE_TO_CASTLE);
 
-					if(nextLabel != null){
-						personagem.transform.position = nextLabel.transform.position;
+					if(stopped){
+						// Here starts the castle script per se
+						castleEvent();
+						
+						// We halt the GO during the combat
+						isGoClicked = false;
 					}
 				}else{
-					GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_VILLAGE);
+					bool stopped = moveTo (ROUTE_CAMP_TO_VILLAGE);
 						
 					// no more labels in this route
-					if(nextLabel == null){
+					if(stopped){
 						step2 = true;
 
 						// Here starts the village script per se
@@ -135,34 +139,18 @@ public class Mission1Script : MonoBehaviour {
 
 						// We halt the GO during the combat
 						isGoClicked = false;
-					
-					}else{
-						personagem.transform.position = nextLabel.transform.position;
 					}
 				}
 				// Direct route
 			}else{
-				// Check if personagem reached next label
-				if(Mathf.Abs(personagem.transform.position.x - target.x) >= 0.01f &&
-				   Mathf.Abs(personagem.transform.position.y - target.y) >= 0.01f &&
-				   !halt){
-					// current position
-					Vector3 current = personagem.transform.position;
-					// 0.0 for default
-					Vector3 currentVelocity = new Vector3(0.0f,0.0f,0.0f);
-					
-					float smoothTime = 0.2f;
+				bool stopped = moveTo (ROUTE_CAMP_TO_CASTLE);
 
-					personagem.transform.position = Vector3.SmoothDamp (current, target, ref currentVelocity, smoothTime);
-				}else{
-					// Get another label
-					GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_CASTLE);
-					if(nextLabel != null){
-						target = new Vector3(nextLabel.transform.position.x,
-						                     nextLabel.transform.position.y,
-						                     personagem.transform.position.z);
-						halt = false;
-					}
+				if(stopped){
+					// Here starts the castle script per se
+					castleEvent();
+
+					// We halt the GO during the combat
+					isGoClicked = false;
 				}
 			}
 		}
@@ -171,8 +159,32 @@ public class Mission1Script : MonoBehaviour {
 		/**************************** PHASE 3 ********************************/
 		if (villageChoice > 0) {
 			if(villageChoice == ATTACK_VILLAGE){
+				Tuple<Troop, Troop> result = combatTurn(localPLayer.Units,villageTroops,0.5f);
+				localPLayer.Units = result.First;
+				villageTroops = result.Second;
 
+				Debug.Log("Allied ammount: "+localPLayer.Units.Units.Count);
+				Debug.Log("Enemy ammount: "+villageTroops.Units.Count);
+
+				// Check end of combat
+				if(localPLayer.Units.Units.Count == 0){
+					// Game over :(
+
+				}else if(villageTroops.Units.Count == 0){
+					// Win :)	
+
+					isGoClicked = true;
+					villageChoice = 0;
+				}
 			}else if(villageChoice == PAY_VILLAGE){
+				isGoClicked = true;
+				villageChoice = 0;
+			}
+		}
+		if (castleChoice > 0) {
+			if(castleChoice == DIRECT_ATTACK_CASTLE){
+
+			}else if(castleChoice == SURPRISE_ATTACK_CASTLE){
 
 			}
 		}
@@ -182,6 +194,38 @@ public class Mission1Script : MonoBehaviour {
 	/*********************************************************************/
 	/************************* AUXILIAR FUNCTIONS ************************/
 	/*********************************************************************/
+
+	bool moveTo(int route){
+		GameObject personagem = GameObject.Find ("Personagem");
+		bool stopped = false;
+
+		// Check if personagem reached next label
+		if(Mathf.Abs(personagem.transform.position.x - target.x) >= 0.01f &&
+		   Mathf.Abs(personagem.transform.position.y - target.y) >= 0.01f &&
+		   !halt){
+			// current position
+			Vector3 current = personagem.transform.position;
+			// 0.0 for default
+			Vector3 currentVelocity = new Vector3(0.0f,0.0f,0.0f);
+			
+			float smoothTime = 0.2f;
+			
+			personagem.transform.position = Vector3.SmoothDamp (current, target, ref currentVelocity, smoothTime);
+		}else{
+			// Get another label
+			GameObject nextLabel = FindClosestLabel(route);
+			if(nextLabel != null){
+				target = new Vector3(nextLabel.transform.position.x,
+				                     nextLabel.transform.position.y,
+				                     personagem.transform.position.z);
+				halt = false;
+			}else{
+				stopped = true;
+			}
+		}
+
+		return stopped;
+	}
 
 	void show(int idx, int route){
 		GameObject[] labels =  GameObject.FindGameObjectsWithTag("Route-"+route);
@@ -207,6 +251,11 @@ public class Mission1Script : MonoBehaviour {
 			                                 "Are you sure you want to follow this route to battle?\n"+info, // text
 			                                 "Yes", "No")) { // yes, no
 				isGoClicked = true;
+				GameObject btnGo = GameObject.Find ("btnGo");
+				GameObject btnCancel = GameObject.Find ("btnCancel");
+
+				btnGo.SetActive(false);
+				btnCancel.SetActive(false);
 			}
 		}
 	}
@@ -271,7 +320,7 @@ public class Mission1Script : MonoBehaviour {
 	/************************************************************************/
 
 	/***************************** Castle Script ***************************/
-	void castleChoiced(){
+	void castleEvent(){
 		if (EditorUtility.DisplayDialog ("You found the castle!", //title
 		                                 "They didn't see your troops yet.\n" +
 		                                 "You can go for the battle directly or prepare your army to a surprise attack.\n" +
@@ -287,27 +336,36 @@ public class Mission1Script : MonoBehaviour {
 	/*************************** Combat Script ******************************/
 	Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, float odds){
 		// Number of units in combat per turn
-		int garther = 6;
+		int garther = 2;
 		int alliedPortion = Mathf.CeilToInt (garther * odds);
 		int enemyPortion = Mathf.FloorToInt (garther * (1-odds));
 
 		// Allies damage enemies
+		Debug.Log("PLAYER PHASE");
 		for (int i = 0; i<alliedPortion; i++) {
 			enemyTroops = damage(enemyTroops, alliedTroops.Units[i].Attack, enemyPortion);
 		}
 
-		/// Enemies damage allies
-		for (int i = 0; i<enemyPortion; i++) {
-			alliedTroops = damage(alliedTroops, enemyTroops.Units[i].Attack, alliedPortion);
+		if (enemyTroops.Units.Count > 0) {
+			Debug.Log("ENEMY PHASE");
+			/// Enemies damage allies
+			for (int i = 0; i<enemyPortion; i++) {
+				alliedTroops = damage(alliedTroops, enemyTroops.Units[i].Attack, alliedPortion);
+			}
 		}
 
 		return new Tuple<Troop, Troop>(alliedTroops, enemyTroops);
 	}
 
 	Troop damage(Troop defender, int damage, int ammount){
-		for (int i = 0; i<Mathf.Min(ammount,defender.Units.Capacity); i++) {
-			defender.Units[i].Heath -=  (int) (damage*defender.Units[i].Armor);
-			if(defender.Units[i].Heath < 0){
+		for (int i = 0; i<Mathf.Min(ammount,defender.Units.Count); i++) {
+			int damageDealt = (int) (damage*defender.Units[i].Armor);
+
+			Debug.Log("A unit dealt "+damageDealt+" damage!\n" +
+			          "Health: "+defender.Units[i].Health+"->"+(defender.Units[i].Health - damageDealt));
+
+			defender.Units[i].Health -=  damageDealt;
+			if(defender.Units[i].Health <= 0){
 				defender.Units.RemoveAt(i);
 			}
 		}
@@ -318,8 +376,12 @@ public class Mission1Script : MonoBehaviour {
 	Troop generateTroop(int size){
 		Troop units = new Troop (new List<Unit>(size));
 		for (int i = 0; i<size; i++) {
-			//units.Units[i] = new Unit("",Random.Range(90, 100),Random.Range(1, 30),Random.Range(0.0f, 4.0f));
-			units.Units.Add(new Unit("",Random.Range(90, 100),Random.Range(1, 30),Random.Range(0.0f, 4.0f)));
+			Unit u = new Unit("",Random.Range(90, 100),Random.Range(10, 30),Random.Range(0.0f, 0.4f));
+			/*Debug.Log("Unit:: \n" +
+				"Health: "+u.Health+"\n" +
+			    "Attack: "+u.Attack+"\n" +
+			    "Armor: "+u.Armor);*/
+			units.Units.Add(u);
 		}
 
 		return units;

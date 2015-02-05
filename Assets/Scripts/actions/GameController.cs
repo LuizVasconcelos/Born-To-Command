@@ -41,13 +41,13 @@ public class Unit
 {
 	public Unit(string Type, int Health, int Attack, float Armor){
 		this.Type = Type;
-		this.Heath = Heath;
+		this.Health = Health;
 		this.Attack = Attack;
 		this.Armor = Armor;
 	}
 
 	public string Type { get; set; }
-	public int Heath { get; set; }
+	public int Health { get; set; }
 	public int Attack { get; set; }
 	public float Armor { get; set; }
 }

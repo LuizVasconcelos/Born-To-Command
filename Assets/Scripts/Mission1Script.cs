@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -17,6 +18,9 @@ public class Mission1Script : MonoBehaviour {
 	// define village choices
 	private readonly int ATTACK_VILLAGE = 4;
 	private readonly int PAY_VILLAGE = 5;
+	// define castle choices
+	private readonly int DIRECT_ATTACK_CASTLE = 6;
+	private readonly int SURPRISE_ATTACK_CASTLE = 7;
 
 	private int index;
 	private bool village3Clicked;
@@ -24,12 +28,15 @@ public class Mission1Script : MonoBehaviour {
 	private float startTime;
 	private bool step2;
 	private bool justarrived;
+	private Vector3 target;
+	private bool halt;
 
 	// Action buttons
 	private bool isGoClicked;
 
 	// Actions
 	private int villageChoice;
+	private int castleChoice;
 
 	// Use this for initialization
 	void Start () {
@@ -40,10 +47,15 @@ public class Mission1Script : MonoBehaviour {
 		isGoClicked = false;
 		step2 = false;
 		villageChoice = 0;
+		castleChoice = 0;
 
 		localPLayer = new Player (1570, 12, generateTroop(112), 0, 1);
 		villageTroops = generateTroop (45);
 		castleTroops = generateTroop (60);
+
+		target = GameObject.Find ("Personagem").transform.position;
+		halt = true;
+
 	}
 	
 	// Update is called once per frame
@@ -119,7 +131,7 @@ public class Mission1Script : MonoBehaviour {
 						step2 = true;
 
 						// Here starts the village script per se
-						villageChoice();
+						villageEvent();
 
 						// We halt the GO during the combat
 						isGoClicked = false;
@@ -130,10 +142,27 @@ public class Mission1Script : MonoBehaviour {
 				}
 				// Direct route
 			}else{
-				GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_CASTLE);
+				// Check if personagem reached next label
+				if(Mathf.Abs(personagem.transform.position.x - target.x) >= 0.01f &&
+				   Mathf.Abs(personagem.transform.position.y - target.y) >= 0.01f &&
+				   !halt){
+					// current position
+					Vector3 current = personagem.transform.position;
+					// 0.0 for default
+					Vector3 currentVelocity = new Vector3(0.0f,0.0f,0.0f);
+					
+					float smoothTime = 0.2f;
 
-				if(nextLabel != null){
-					personagem.transform.position = nextLabel.transform.position;
+					personagem.transform.position = Vector3.SmoothDamp (current, target, ref currentVelocity, smoothTime);
+				}else{
+					// Get another label
+					GameObject nextLabel = FindClosestLabel(ROUTE_CAMP_TO_CASTLE);
+					if(nextLabel != null){
+						target = new Vector3(nextLabel.transform.position.x,
+						                     nextLabel.transform.position.y,
+						                     personagem.transform.position.z);
+						halt = false;
+					}
 				}
 			}
 		}
@@ -149,6 +178,10 @@ public class Mission1Script : MonoBehaviour {
 		}
 		/*********************************************************************/
 	}
+
+	/*********************************************************************/
+	/************************* AUXILIAR FUNCTIONS ************************/
+	/*********************************************************************/
 
 	void show(int idx, int route){
 		GameObject[] labels =  GameObject.FindGameObjectsWithTag("Route-"+route);
@@ -216,14 +249,15 @@ public class Mission1Script : MonoBehaviour {
 		if (closest != null) {
 				Vector3 scale = closest.transform.localScale;
 				scale.x = 27f;
-				closest.transform.localScale = scale;		
+				closest.transform.localScale = scale;
+				//closest.renderer.material.color = Color.green;
 		}
 		
 		return closest;
 	}
 
 	/***************************** Village Script ***************************/
-	void villageChoice(){
+	void villageEvent(){
 		if (EditorUtility.DisplayDialog ("You arrived at the forest village", //title
 		                                 "People from the village are not allied of your reign and seem a bit hostile.\n" +
 		                                 "They don't have enough weaponry and a combat would favor your army.\n" +
@@ -236,12 +270,26 @@ public class Mission1Script : MonoBehaviour {
 	}
 	/************************************************************************/
 
+	/***************************** Castle Script ***************************/
+	void castleChoiced(){
+		if (EditorUtility.DisplayDialog ("You found the castle!", //title
+		                                 "They didn't see your troops yet.\n" +
+		                                 "You can go for the battle directly or prepare your army to a surprise attack.\n" +
+		                                 "Hint: For surprise attack, you need more supplies to wait for the best time to go for it.\n", // text
+		                                 "Direct attack", "Surprise attack")) { // yes, no
+			castleChoice = DIRECT_ATTACK_CASTLE;
+		}else{
+			castleChoice = SURPRISE_ATTACK_CASTLE;
+		}
+	}
+	/************************************************************************/
+
 	/*************************** Combat Script ******************************/
 	Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, float odds){
 		// Number of units in combat per turn
 		int garther = 6;
-		int alliedPortion = Mathf.Ceil (garther * odds);
-		int enemyPortion = Mathf.Floor (garther * (1-odds));
+		int alliedPortion = Mathf.CeilToInt (garther * odds);
+		int enemyPortion = Mathf.FloorToInt (garther * (1-odds));
 
 		// Allies damage enemies
 		for (int i = 0; i<alliedPortion; i++) {
@@ -253,12 +301,12 @@ public class Mission1Script : MonoBehaviour {
 			alliedTroops = damage(alliedTroops, enemyTroops.Units[i].Attack, alliedPortion);
 		}
 
-		return new Tuple<alliedTroops, enemyTroops>();
+		return new Tuple<Troop, Troop>(alliedTroops, enemyTroops);
 	}
 
 	Troop damage(Troop defender, int damage, int ammount){
 		for (int i = 0; i<Mathf.Min(ammount,defender.Units.Capacity); i++) {
-			defender.Units[i].Heath -=  damage*defender.Units[i].Armor;
+			defender.Units[i].Heath -=  (int) (damage*defender.Units[i].Armor);
 			if(defender.Units[i].Heath < 0){
 				defender.Units.RemoveAt(i);
 			}
@@ -268,9 +316,10 @@ public class Mission1Script : MonoBehaviour {
 
 	// Dummy function
 	Troop generateTroop(int size){
-		Troop units = new Troop (new Unit[size]);
+		Troop units = new Troop (new List<Unit>(size));
 		for (int i = 0; i<size; i++) {
-			units.Units[i] = new Unit("",Random.Range(90, 100),Random.Range(1, 30),Random.Range(0.0f, 4.0f));
+			//units.Units[i] = new Unit("",Random.Range(90, 100),Random.Range(1, 30),Random.Range(0.0f, 4.0f));
+			units.Units.Add(new Unit("",Random.Range(90, 100),Random.Range(1, 30),Random.Range(0.0f, 4.0f)));
 		}
 
 		return units;

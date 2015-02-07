@@ -9,27 +9,33 @@ public class scriptSaveScene : MonoBehaviour {
 	private Player player = new Player(10,10, new Troop(new List<Unit>()), 10, 10);
 
 	void OnButtonClicked1(){
-		(new GameController()).SaveGame(1, player);
+		numberGame = 1;
+		// TODO Update Player data information for this slot
 		Debug.Log ("Button 1 clicked.");
 	}
 
 	void OnButtonClicked2(){
-		(new GameController()).SaveGame(2, player);
+		numberGame = 2;
+		// TODO Update Player data information for this slot
 		Debug.Log ("Button 2 clicked.");
 	}
 
 	void OnButtonClicked3(){
-		(new GameController()).SaveGame(3, player);
+		numberGame = 3;
+		// TODO Update Player data information for this slot
 		Debug.Log ("Button 3 clicked.");
 	}
 
 	void OnButtonClicked4(){
-		(new GameController()).SaveGame(4, player);
+		numberGame = 4;
+		// TODO Update Player data information for this slot
 		Debug.Log ("Button 4 clicked.");
 	}
 
 	void OnButtonSaveClicked(){
+		Debug.Log ("Saving game number " + numberGame);
+		(new GameController()).SaveGame(numberGame, player);
+		Debug.Log ("Game " + numberGame + " saved.");
 		Application.LoadLevel("mainMenu");
 	}
-
 }

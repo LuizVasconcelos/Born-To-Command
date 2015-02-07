@@ -48,6 +48,8 @@ public class Unit
 		this.Armor = Armor;
 	}
 
+	public Unit(){}
+
 	public int RollAttackDie(){
 		int result = 0;
 		for (int i = 1; i<this.NumDie; i++) {
@@ -74,6 +76,8 @@ public class Troop
 		this.Deaths = Deaths;
 	}
 
+	public Troop(){}
+
 	public List<Unit> Units { get; set; }
 	public int Deaths { get; set; }
 }
@@ -88,6 +92,8 @@ public class Player
 		this.Moral = Moral;
 		this.Travelling = Travelling;
 	}
+
+	public Player(){}
 
 	[XmlElement]
 	public int Gold { get; set; }

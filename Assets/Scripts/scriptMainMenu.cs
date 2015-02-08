@@ -16,7 +16,7 @@ public class scriptMainMenu : MonoBehaviour {
 
 	void OnLoadGameClicked(){
 		Debug.Log("On Load Game");
-		Application.LoadLevel ("SaveGameMenuScene");
+		Application.LoadLevel ("LoadGameMenuScene");
 	}
 
 	void OnOptionsClicked(){

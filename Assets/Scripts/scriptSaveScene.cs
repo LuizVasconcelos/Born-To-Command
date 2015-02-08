@@ -5,8 +5,10 @@ using System.Collections.Generic;
 
 public class scriptSaveScene : MonoBehaviour {
 
-	private int numberGame = 0;
-	private Player player = new Player(10,10, new Troop(new List<Unit>()), 10, 10);
+	// Game id default
+	private int numberGame = 1; 
+	// Current Data player
+	private Player player = new Player();
 
 	void OnButtonClicked1(){
 		numberGame = 1;
@@ -33,9 +35,11 @@ public class scriptSaveScene : MonoBehaviour {
 	}
 
 	void OnButtonSaveClicked(){
+		GameManager.currentNumberGame = numberGame;
+		player = GameManager.player;
 		Debug.Log ("Saving game number " + numberGame);
 		(new GameController()).SaveGame(numberGame, player);
 		Debug.Log ("Game " + numberGame + " saved.");
-		Application.LoadLevel("mainMenu");
+		Application.LoadLevel("mainScene");
 	}
 }

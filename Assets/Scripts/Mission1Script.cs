@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
+#endif 
 
+#if UNITY_EDITOR
 public class Mission1Script : MonoBehaviour {
 
 	// Players variables
@@ -18,8 +21,8 @@ public class Mission1Script : MonoBehaviour {
 	private readonly int ATTACK_VILLAGE = 4;
 	private readonly int PAY_VILLAGE = 5;
 	// define castle choices
-	private readonly int DIRECT_ATTACK_CASTLE = 6;
-	private readonly int SURPRISE_ATTACK_CASTLE = 7;
+	private readonly int ATTACK_CASTLE = 6;
+	private readonly int DUEL_CASTLE = 7;
 
 	private int index;
 	private bool village3Clicked;
@@ -49,9 +52,9 @@ public class Mission1Script : MonoBehaviour {
 		villageChoice = 0;
 		castleChoice = 0;
 
-		localPLayer = new Player (1570, 6, generateTroop(50), 0, 0);
-		villageTroops = generateTroop (30);
-		castleTroops = generateTroop (60);
+		localPLayer = GameManager.player;
+		villageTroops = Player.generateTroop (40);
+		castleTroops = Player.generateTroop (70);
 
 		target = GameObject.Find ("Personagem").transform.position;
 		halt = true;
@@ -61,7 +64,7 @@ public class Mission1Script : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+		
 		// Update log and status text
 		updateStatus ();
 		updateLog ();
@@ -178,6 +181,7 @@ public class Mission1Script : MonoBehaviour {
 				// Check end of combat
 				if(localPLayer.Units.Units.Count == 0){
 					// Game over :(
+					gameOver("Your forces have been defeated by the forest folk!", false);
 
 				}else if(villageTroops.Units.Count == 0){
 					// Win :)	
@@ -195,10 +199,42 @@ public class Mission1Script : MonoBehaviour {
 			}
 		}
 		if (castleChoice > 0) {
-			if(castleChoice == DIRECT_ATTACK_CASTLE){
-
-			}else if(castleChoice == SURPRISE_ATTACK_CASTLE){
-
+			if(castleChoice == ATTACK_CASTLE){
+				int total = localPLayer.Units.Units.Count+castleTroops.Units.Count;
+				float odds = (float)localPLayer.Units.Units.Count/(float)total;
+				odds = Mathf.Max(odds, 0.35f);
+				//Debug.Log("total::odds = "+total+"::"+odds);
+				Tuple<Troop, Troop> result = combatTurn(localPLayer.Units,castleTroops,odds);
+				localPLayer.Units = result.First;
+				castleTroops = result.Second;
+				
+				Debug.Log("Allied ammount: "+localPLayer.Units.Units.Count);
+				Debug.Log("Enemy ammount: "+castleTroops.Units.Count);
+				
+				// Check end of combat
+				if(localPLayer.Units.Units.Count == 0){
+					// Game over :(
+					gameOver("Your forces have been defeated by the castellan's!", false);
+					
+				}else if(castleTroops.Units.Count == 0){
+					// Win :)	
+					gameOver("You defeated the castellan forces! The castle is yours.", true);
+					
+					isGoClicked = true;
+					localPLayer.Food += 10;
+					localPLayer.Gold += 1500;
+					castleChoice = 0;
+				}
+			}else if(castleChoice == DUEL_CASTLE){
+				// Roll a die
+				int result = Random.Range(1,20);
+				if(result>10){
+					// Win :)
+					gameOver("Your champion won! The castle is yours.", true);
+				}else{
+					// Game Over :(
+					gameOver("Your champion lost!", false);
+				}
 			}
 		}
 		/*********************************************************************/
@@ -207,6 +243,25 @@ public class Mission1Script : MonoBehaviour {
 	/*********************************************************************/
 	/************************* AUXILIAR FUNCTIONS ************************/
 	/*********************************************************************/
+
+	void gameOver(string msg, bool win){
+		string title = "";
+		string ok = "";
+
+		if (win) {
+			title = "You win!";
+			ok = "Proceed";
+			localPLayer.Game = new bool[]{true};
+		} else {
+			title = "You lose!";
+			ok = "Try again";
+		}
+		if (EditorUtility.DisplayDialog (title, //title
+		                                 msg, // text
+		                                 ok)) { // yes, no
+			Application.LoadLevel ("mainScene");
+		}
+	}
 
 	void starving(){
 		int score = localPLayer.Food - localPLayer.Travelling;
@@ -413,13 +468,12 @@ public class Mission1Script : MonoBehaviour {
 	/***************************** Castle Script ***************************/
 	void castleEvent(){
 		if (EditorUtility.DisplayDialog ("You found the castle!", //title
-		                                 "They didn't see your troops yet.\n" +
-		                                 "You can go for the battle directly or prepare your army to a surprise attack.\n" +
-		                                 "Hint: For surprise attack, you need more supplies to wait for the best time to go for it.\n", // text
-		                                 "Direct attack", "Surprise attack")) { // yes, no
-			castleChoice = DIRECT_ATTACK_CASTLE;
+		                                 "The castle is very fortified. Attacking directly might cost you many fighters.\n"+
+		                                 "Another option is to challange the castellan, your best champion against his.",
+		                                 "Direct attack", "Duel")) { // yes, no
+			castleChoice = ATTACK_CASTLE;
 		}else{
-			castleChoice = SURPRISE_ATTACK_CASTLE;
+			castleChoice = DUEL_CASTLE;
 		}
 	}
 	/************************************************************************/
@@ -434,9 +488,11 @@ public class Mission1Script : MonoBehaviour {
 		int enemyPortion = Mathf.Max(Mathf.FloorToInt (enemyOdds),1);
 
 		// Allies damage enemies
-		Debug.Log("PLAYER PHASE ("+alliedPortion+")");
-		for (int i = 0; i<alliedPortion; i++) {
-			enemyTroops = damage(enemyTroops, alliedTroops.Units[i], alliedPortion);
+		if (alliedTroops.Units.Count > 0) {
+			Debug.Log ("PLAYER PHASE (" + alliedPortion + ")");
+			for (int i = 0; i<alliedPortion; i++) {
+				enemyTroops = damage (enemyTroops, alliedTroops.Units [i], alliedPortion);
+			}
 		}
 
 		if (enemyTroops.Units.Count > 0) {
@@ -453,8 +509,11 @@ public class Mission1Script : MonoBehaviour {
 	Troop damage(Troop defenders, Unit attacker, int ammount){
 		int damage = attacker.RollAttackDie ();
 
-		for (int i = 0; i<Mathf.Min(ammount,defenders.Units.Count); i++) {
-			Unit defender = defenders.Units[i];
+		for (int i = 0; i<ammount && defenders.Units.Count > 0; i++) {
+
+			int idx = Random.Range(0,(defenders.Units.Count-1));
+
+			Unit defender = defenders.Units[idx];
 			float rawDamage = damage*defender.Armor;
 
 			// Rock-paper-scisors bonuses
@@ -473,41 +532,13 @@ public class Mission1Script : MonoBehaviour {
 
 			defender.Health -=  damageDealt;
 			if(defender.Health <= 0){
-				defenders.Units.RemoveAt(i);
+				defenders.Units.RemoveAt(idx);
 				defenders.Deaths += 1;
 			}
 		}
 		return defenders;
 	}
 
-	// Dummy function
-	Troop generateTroop(int size){
-		Troop units = new Troop (new List<Unit>(size));
-		for (int i = 0; i<size; i++) {
-			int type = Random.Range(1,4);
-			Unit u = null;
-			switch(type){
-				case 1:
-					u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
-					break;
-				case 2:
-					u = new Unit(Unit.KNIGHT,100,2,35,0.35f);
-					break;
-				case 3:
-					u = new Unit(Unit.ARCHER,100,100,1,0.05f);
-					break;
-				default:
-					u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
-					break;
-			}
-			/*Debug.Log("Unit:: \n" +
-				"Health: "+u.Health+"\n" +
-			    "Attack: "+u.Attack+"\n" +
-			    "Armor: "+u.Armor);*/
-			units.Units.Add(u);
-		}
-
-		return units;
-	}
 	/************************************************************************/
 }
+#endif 

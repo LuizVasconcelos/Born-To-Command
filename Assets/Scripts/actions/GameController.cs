@@ -51,7 +51,7 @@ public class Unit
 	public Unit(){}
 
 	public int RollAttackDie(){
-		int result = 0;
+		int result = 1;
 		for (int i = 1; i<this.NumDie; i++) {
 			result += Random.Range(1, this.AttackDie);
 		}
@@ -85,16 +85,46 @@ public class Troop
 [XmlRoot]
 public class Player
 {
-	public Player (int Gold, int Food, Troop Units, int Moral, int Travelling){
+	public Player (int Gold, int Food, Troop Units, int Moral, int Travelling, bool[] Game){
 		this.Gold = Gold;
 		this.Food = Food;
 		this.Units = Units;
 		this.Moral = Moral;
 		this.Travelling = Travelling;
+		this.Game = Game;
 	}
 
 	public Player(){}
 
+	public static Troop generateTroop(int size){
+		Troop units = new Troop (new List<Unit>(size));
+		for (int i = 0; i<size; i++) {
+			int type = Random.Range(1,4);
+			Unit u = null;
+			switch(type){
+			case 1:
+				u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
+				break;
+			case 2:
+				u = new Unit(Unit.KNIGHT,100,2,35,0.35f);
+				break;
+			case 3:
+				u = new Unit(Unit.ARCHER,100,100,1,0.05f);
+				break;
+			default:
+				u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
+				break;
+			}
+			/*Debug.Log("Unit:: \n" +
+				"Health: "+u.Health+"\n" +
+			    "Attack: "+u.Attack+"\n" +
+			    "Armor: "+u.Armor);*/
+			units.Units.Add(u);
+		}
+		
+		return units;
+	}
+	
 	[XmlElement]
 	public int Gold { get; set; }
 	
@@ -109,6 +139,9 @@ public class Player
 	
 	[XmlElement]
 	public int Travelling { get; set; }
+
+	[XmlArray]
+	public bool[] Game { get; set; }
 }
 
 

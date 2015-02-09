@@ -25,6 +25,8 @@ public class scriptMainScene : MonoBehaviour {
 
 	private bool showMessage;
 
+	private Player localPlayer;
+
 	// Use this for initialization
 	void Start () {
 		isBlacksmithClicked = false;
@@ -40,18 +42,33 @@ public class scriptMainScene : MonoBehaviour {
 		currentRotation = new Vector3(btnMissions.transform.rotation.x,btnMissions.transform.rotation.y,btnMissions.transform.rotation.z);
 
 		scroll = GameObject.Find("scroll");
-		currentMiddleScroll = scroll.transform.localScale.y;
+		if (scroll != null) {
+			currentMiddleScroll = scroll.transform.localScale.y;
+		}
 		openScroll = false;
 
 		btnTarget1 = GameObject.Find ("btnTarget1");
 
 		panel = GameObject.Find ("Panel");
 
-		scroll.SetActive(false);
+		if (scroll != null) {
+			scroll.SetActive (false);
+		}
+
+		bool[] game = new bool[]{false};
+		if(GameManager.player == null){
+			localPlayer = new Player (1570, 6, Player.generateTroop(150), 0, 0,game);
+			GameManager.player = localPlayer;
+		}
+		localPlayer = GameManager.player;
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		if (localPlayer.Game [0] == true) {
+
+		}
+
 		if (isBlacksmithClicked) {
 						// current camera depth
 						float current = Camera.main.camera.orthographicSize;
@@ -195,16 +212,7 @@ public class scriptMainScene : MonoBehaviour {
 				} else if (isSaveGameClicked) {
 						isSaveGameClicked = false;
 						Debug.Log ("Save Game");
-						/*
-						if(UnityEditor.EditorUtility.DisplayDialog("Game Over", "Again?", "Restart", "Exit")){
-							Debug.Log ("Yes");
-							isSaveGameClicked = false;
-						}else{
-							Debug.Log ("No");
-							isSaveGameClicked = false;
-						}
-						*/
-						// TODO Salvar as configuraçoes atuais do jogo
+						Application.LoadLevel("SaveGameMenuScene");
 		} else if (isTarget1Clicked){
 			Application.LoadLevel ("mission1Scene");
 		}

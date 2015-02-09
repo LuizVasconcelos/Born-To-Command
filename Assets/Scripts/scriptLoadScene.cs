@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 public class scriptLoadScene : MonoBehaviour {
 	private int numberGame = 0;
-	private Player player = new Player(10,10, new Troop(new List<Unit>()), 10, 10);
+	private Player player = new Player(10,10, new Troop(new List<Unit>()), 10, 10, new bool[]{false});
 	
 	void OnButtonClicked1(){
 		numberGame = 1;

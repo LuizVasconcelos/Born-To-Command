@@ -20,6 +20,7 @@ public class scriptMainScene : MonoBehaviour {
 	private GameObject btnMissions;
 	private Vector3 currentRotation;
 	private GameObject scroll;
+	private float currentMiddleScroll;
 	private bool openScroll;
 
 	private bool showMessage;
@@ -39,6 +40,7 @@ public class scriptMainScene : MonoBehaviour {
 		currentRotation = new Vector3(btnMissions.transform.rotation.x,btnMissions.transform.rotation.y,btnMissions.transform.rotation.z);
 
 		scroll = GameObject.Find("scroll");
+		currentMiddleScroll = scroll.transform.localScale.y;
 		openScroll = false;
 
 		btnTarget1 = GameObject.Find ("btnTarget1");
@@ -129,24 +131,24 @@ public class scriptMainScene : MonoBehaviour {
 							if(!openScroll) {
 								Vector3 currentPosition = btnMissions.transform.position;
 								Vector3 currentScale = btnMissions.transform.localScale;
-								Vector3 target = new Vector3 (1.5f, 0.0f, currentPosition.z);
+								Vector3 target = new Vector3 (0.0f, 0.0f, currentPosition.z);
 								Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
 								float currentVelocity = 0.0f;
-								float smoothTime = 0.2f;
+								float smoothTime = 0.15f;
 
 								btnMissions.transform.position = Vector3.SmoothDamp (currentPosition, target, ref velocity, smoothTime);
 
 								Debug.Log ("x: " + btnMissions.transform.position.x);
 
-								if ((btnMissions.transform.position.x >= 1.49f) && 
+								if ((btnMissions.transform.position.x <= 0.01f) && 
 										(btnMissions.transform.position.y >= (-0.01f))) {
 
-										target = new Vector3 (3.0f, 0.9f, currentPosition.z);
+										target = new Vector3 (2.75f, 2.00f, currentPosition.z);
 
 										btnMissions.transform.localScale = Vector3.SmoothDamp (currentScale, target, ref velocity, smoothTime);
 
-										if ((btnMissions.transform.localScale.x >= 2.99f) &&
-												(btnMissions.transform.localScale.y >= 0.89f)) {
+										if ((btnMissions.transform.localScale.x >= 2.74f) &&
+												(btnMissions.transform.localScale.y >= 1.99f)) {
 											btnMissions.SetActive(false);
 											scroll.SetActive(true);
 											openScroll = true;
@@ -155,15 +157,35 @@ public class scriptMainScene : MonoBehaviour {
 							}else {
 								GameObject leftSide = scroll.transform.FindChild("leftSide").gameObject;
 								GameObject middle = scroll.transform.FindChild("middle").gameObject;
-					
+								GameObject rightSide = scroll.transform.FindChild("rightSide").gameObject;
+
 								Vector3 currentPosition2 = leftSide.transform.position;
-								Vector3 target2 = new Vector3 ((-1.4f), leftSide.transform.position.y, leftSide.transform.position.z);
+								Vector3 target2 = new Vector3 ((-1.45f), leftSide.transform.position.y, leftSide.transform.position.z);
 								Vector3 velocity2 = new Vector3 (0.0f, 0.0f, 0.0f);
-								float currentVelocity2 = 0.0f;
-								float smoothTime2 = 0.1f;
-					
-								if(leftSide.transform.position.x > (-1.4f)) {
+								float smoothTime2 = 0.3f;
+
+								Vector3 currentPosition3 = rightSide.transform.position;
+								Vector3 target3 = new Vector3 (1.45f, rightSide.transform.position.y, rightSide.transform.position.z);
+								Vector3 velocity3 = new Vector3 (0.0f, 0.0f, 0.0f);
+								float smoothTime3 = 0.3f;
+
+								//Vector3 newScrollContentPosition = new Vector3((currentPosition2.x + rightSide.transform.position.x)/2, middle.transform.position.y, middle.transform.position.z);
+								Vector3 newScrollContentScale = new Vector3(middle.transform.localScale.x, 3.0f, middle.transform.localScale.z);
+								Vector3 currentScrollContentScale = new Vector3(middle.transform.localScale.x,middle.transform.localScale.y,middle.transform.localScale.z);
+								Vector3 velocity4 = new Vector3 (0.0f, 0.0f, 0.0f);
+								float smoothTime4 = 0.3f;
+
+								if((leftSide.transform.position.x >= (-1.44f))
+					   				&& (rightSide.transform.position.x <= 1.44f)) {
 									leftSide.transform.position = Vector3.SmoothDamp(currentPosition2, target2, ref velocity2, smoothTime2);
+									rightSide.transform.position = Vector3.SmoothDamp(currentPosition3, target3, ref velocity3, smoothTime3);
+
+
+
+
+
+
+									middle.transform.localScale = Vector3.SmoothDamp(currentScrollContentScale, newScrollContentScale, ref velocity4, smoothTime4);
 						
 								}else {
 									isMissionsClicked = false;								

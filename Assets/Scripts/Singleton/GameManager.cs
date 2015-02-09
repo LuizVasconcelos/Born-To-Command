@@ -11,6 +11,6 @@ http://blog.christianhenschel.com/2013/05/16/how-to-pass-data-between-scenes-sta
 
 public class GameManager : MonoBehaviour {
 	static public int currentNumberGame = 1;
-	static public Player player = new Player();
+	static public Player player;
 }
 

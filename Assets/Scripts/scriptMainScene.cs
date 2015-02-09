@@ -56,8 +56,11 @@ public class scriptMainScene : MonoBehaviour {
 		}
 
 		bool[] game = new bool[]{false};
-		localPlayer = new Player (1570, 6, Player.generateTroop(150), 0, 0,game);
-		GameManager.player = localPlayer;
+		if(GameManager.player == null){
+			localPlayer = new Player (1570, 6, Player.generateTroop(150), 0, 0,game);
+			GameManager.player = localPlayer;
+		}
+		localPlayer = GameManager.player;
 	}
 	
 	// Update is called once per frame
@@ -209,16 +212,7 @@ public class scriptMainScene : MonoBehaviour {
 				} else if (isSaveGameClicked) {
 						isSaveGameClicked = false;
 						Debug.Log ("Save Game");
-						/*
-						if(UnityEditor.EditorUtility.DisplayDialog("Game Over", "Again?", "Restart", "Exit")){
-							Debug.Log ("Yes");
-							isSaveGameClicked = false;
-						}else{
-							Debug.Log ("No");
-							isSaveGameClicked = false;
-						}
-						*/
-						// TODO Salvar as configuraçoes atuais do jogo
+						Application.LoadLevel("SaveGameMenuScene");
 		} else if (isTarget1Clicked){
 			Application.LoadLevel ("mission1Scene");
 		}

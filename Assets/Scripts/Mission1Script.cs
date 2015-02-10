@@ -9,9 +9,12 @@ using UnityEditor;
 public class Mission1Script : MonoBehaviour {
 
 	// Players variables
-	private Player localPLayer;
+	private Player localPlayer;
+	private int playerTroopsMax;
 	private Troop villageTroops;
+	private int villageTroopsMax;
 	private Troop castleTroops;
+	private int castleTroopsMax;
 
 	// define routes
 	private readonly int ROUTE_CAMP_TO_VILLAGE = 1;
@@ -52,9 +55,12 @@ public class Mission1Script : MonoBehaviour {
 		villageChoice = 0;
 		castleChoice = 0;
 
-		localPLayer = GameManager.player;
-		villageTroops = Player.generateTroop (40);
-		castleTroops = Player.generateTroop (70);
+		localPlayer = GameManager.player;
+		playerTroopsMax = localPlayer.Units.Units.Count;
+		villageTroopsMax = 40;
+		castleTroopsMax = 70;
+		villageTroops = Player.generateTroop (villageTroopsMax);
+		castleTroops = Player.generateTroop (castleTroopsMax);
 
 		target = GameObject.Find ("Personagem").transform.position;
 		halt = true;
@@ -65,9 +71,10 @@ public class Mission1Script : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		
-		// Update log and status text
+		// Update all
 		updateStatus ();
 		updateLog ();
+		updateBars ();
 
 		/**************************** PHASE 1 ********************************/
 
@@ -168,18 +175,18 @@ public class Mission1Script : MonoBehaviour {
 		/**************************** PHASE 3 ********************************/
 		if (villageChoice > 0) {
 			if(villageChoice == ATTACK_VILLAGE){
-				int total = localPLayer.Units.Units.Count+villageTroops.Units.Count;
-				float odds = (float)localPLayer.Units.Units.Count/(float)total;
+				int total = localPlayer.Units.Units.Count+villageTroops.Units.Count;
+				float odds = (float)localPlayer.Units.Units.Count/(float)total;
 				//Debug.Log("total::odds = "+total+"::"+odds);
-				Tuple<Troop, Troop> result = combatTurn(localPLayer.Units,villageTroops,odds);
-				localPLayer.Units = result.First;
+				Tuple<Troop, Troop> result = GameController.combatTurn(localPlayer.Units,villageTroops,odds);
+				localPlayer.Units = result.First;
 				villageTroops = result.Second;
 
-				Debug.Log("Allied ammount: "+localPLayer.Units.Units.Count);
+				Debug.Log("Allied ammount: "+localPlayer.Units.Units.Count);
 				Debug.Log("Enemy ammount: "+villageTroops.Units.Count);
 
 				// Check end of combat
-				if(localPLayer.Units.Units.Count == 0){
+				if(localPlayer.Units.Units.Count == 0){
 					// Game over :(
 					gameOver("Your forces have been defeated by the forest folk!", false);
 
@@ -187,32 +194,32 @@ public class Mission1Script : MonoBehaviour {
 					// Win :)	
 
 					isGoClicked = true;
-					localPLayer.Food += 6;
-					localPLayer.Gold += 500;
+					localPlayer.Food += 6;
+					localPlayer.Gold += 500;
 					villageChoice = 0;
 				}
 			}else if(villageChoice == PAY_VILLAGE){
 				isGoClicked = true;
-				localPLayer.Food += 4;
-				localPLayer.Gold -= 1000;
+				localPlayer.Food += 4;
+				localPlayer.Gold -= 1000;
 				villageChoice = 0;
 			}
 		}
 		if (castleChoice > 0) {
 			if(castleChoice == ATTACK_CASTLE){
-				int total = localPLayer.Units.Units.Count+castleTroops.Units.Count;
-				float odds = (float)localPLayer.Units.Units.Count/(float)total;
+				int total = localPlayer.Units.Units.Count+castleTroops.Units.Count;
+				float odds = (float)localPlayer.Units.Units.Count/(float)total;
 				odds = Mathf.Max(odds, 0.35f);
 				//Debug.Log("total::odds = "+total+"::"+odds);
-				Tuple<Troop, Troop> result = combatTurn(localPLayer.Units,castleTroops,odds);
-				localPLayer.Units = result.First;
+				Tuple<Troop, Troop> result = GameController.combatTurn(localPlayer.Units,castleTroops,odds);
+				localPlayer.Units = result.First;
 				castleTroops = result.Second;
 				
-				Debug.Log("Allied ammount: "+localPLayer.Units.Units.Count);
+				Debug.Log("Allied ammount: "+localPlayer.Units.Units.Count);
 				Debug.Log("Enemy ammount: "+castleTroops.Units.Count);
 				
 				// Check end of combat
-				if(localPLayer.Units.Units.Count == 0){
+				if(localPlayer.Units.Units.Count == 0){
 					// Game over :(
 					gameOver("Your forces have been defeated by the castellan's!", false);
 					
@@ -221,8 +228,8 @@ public class Mission1Script : MonoBehaviour {
 					gameOver("You defeated the castellan forces! The castle is yours.", true);
 					
 					isGoClicked = true;
-					localPLayer.Food += 10;
-					localPLayer.Gold += 1500;
+					localPlayer.Food += 10;
+					localPlayer.Gold += 1500;
 					castleChoice = 0;
 				}
 			}else if(castleChoice == DUEL_CASTLE){
@@ -251,7 +258,7 @@ public class Mission1Script : MonoBehaviour {
 		if (win) {
 			title = "You win!";
 			ok = "Proceed";
-			localPLayer.Game = new bool[]{true};
+			localPlayer.Game = new bool[]{true};
 		} else {
 			title = "You lose!";
 			ok = "Try again";
@@ -264,15 +271,30 @@ public class Mission1Script : MonoBehaviour {
 	}
 
 	void starving(){
-		int score = localPLayer.Food - localPLayer.Travelling;
+		int score = localPlayer.Food - localPlayer.Travelling;
 		if (score < 0) {
 			score = Mathf.Abs(score);
 			// Soldiers die due to starvation
-			for(int i = 1; i< Mathf.Min(score*2,localPLayer.Units.Units.Count); i++){
-				localPLayer.Units.Units.RemoveAt(i);
-				localPLayer.Units.Deaths++;
+			for(int i = 1; i< Mathf.Min(score*2,localPlayer.Units.Units.Count); i++){
+				localPlayer.Units.Units.RemoveAt(i);
+				localPlayer.Units.Deaths++;
 			}
 		}
+	}
+
+	void updateBars(){
+		//updateBar ("Personagem", playerTroopsMax, localPlayer.Units.Units.Count);
+		updateBar ("Castle", castleTroopsMax, castleTroops.Units.Count);
+		updateBar ("Village3", villageTroopsMax, villageTroops.Units.Count);				
+	}
+
+	void updateBar(string objName, int total, int current){
+		GameObject bar = GameObject.Find (objName+"/Foreground-bar");
+		Vector3 scale = bar.transform.localScale;
+
+		// 200 is the total scale
+		scale.x = 200 * ((float)current / (float)total);
+		bar.transform.localScale = scale;
 	}
 
 	void updateLog(){
@@ -280,18 +302,18 @@ public class Mission1Script : MonoBehaviour {
 		UILabel content = log.GetComponent<UILabel> ();
 
 		int swordmans = 0, knights = 0, archers = 0, wounded = 0;
-		int dead = localPLayer.Units.Deaths;
+		int dead = localPlayer.Units.Deaths;
 
-		for (int i = 0; i<localPLayer.Units.Units.Count; i++) {
-			if(localPLayer.Units.Units[i].Type.Equals(Unit.SWORDMAN)){
+		for (int i = 0; i<localPlayer.Units.Units.Count; i++) {
+			if(localPlayer.Units.Units[i].Type.Equals(Unit.SWORDMAN)){
 				swordmans++;
-			}else if(localPLayer.Units.Units[i].Type.Equals(Unit.KNIGHT)){
+			}else if(localPlayer.Units.Units[i].Type.Equals(Unit.KNIGHT)){
 				knights++;
-			}else if(localPLayer.Units.Units[i].Type.Equals(Unit.ARCHER)){
+			}else if(localPlayer.Units.Units[i].Type.Equals(Unit.ARCHER)){
 				archers++;
 			}
 
-			if(localPLayer.Units.Units[i].Health < 100){
+			if(localPlayer.Units.Units[i].Health < 100){
 				wounded++;
 			}
 		}
@@ -313,26 +335,27 @@ public class Mission1Script : MonoBehaviour {
 		UILabel content = status.GetComponent<UILabel> ();
 
 		string moral = "";
-		if (localPLayer.Moral == 0) {
+		if (localPlayer.Moral == 0) {
 			moral = "stable";
-		}else if(localPLayer.Moral < 0 && localPLayer.Moral >= -50){
+		}else if(localPlayer.Moral < 0 && localPlayer.Moral >= -50){
 			moral = "low";
 		}
-		else if(localPLayer.Moral > 0 && localPLayer.Moral <= 50){
+		else if(localPlayer.Moral > 0 && localPlayer.Moral <= 50){
 			moral = "graceful";
-		}else if(localPLayer.Moral < -50){
+		}else if(localPlayer.Moral < -50){
 			moral = "critical";
-		}else if(localPLayer.Moral > 50){
+		}else if(localPlayer.Moral > 50){
 			moral = "untouchable";
 		}
 
-		content.text = "Gold: "+localPLayer.Gold+"g\n"+
-					   	"Food: "+Mathf.Max((localPLayer.Food-localPLayer.Travelling),0)+" day(s) worth\n"+
+		content.text = "Gold: "+localPlayer.Gold+"g\n"+
+					   	"Food: "+Mathf.Max((localPlayer.Food-localPlayer.Travelling),0)+" day(s) worth\n"+
 						"Troop's moral: "+moral+"\n"+
-						"Days traveling: "+localPLayer.Travelling+" day";
+						"Days traveling: "+localPlayer.Travelling+" day";
 	}
 
 	bool moveTo(int route){
+
 		GameObject personagem = GameObject.Find ("Personagem");
 		bool stopped = false;
 
@@ -357,7 +380,7 @@ public class Mission1Script : MonoBehaviour {
 				labelsCrossed++;
 				if(labelsCrossed == 3){
 					labelsCrossed = 0;
-					localPLayer.Travelling++;
+					localPlayer.Travelling++;
 					starving();
 				}
 
@@ -476,69 +499,6 @@ public class Mission1Script : MonoBehaviour {
 			castleChoice = DUEL_CASTLE;
 		}
 	}
-	/************************************************************************/
-
-	/*************************** Combat Script ******************************/
-	Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, float odds){
-		// Number of units in combat per turn
-		int garther = 20;
-		float alliedOdds = garther * odds;
-		float enemyOdds = garther * (1-odds);
-		int alliedPortion = Mathf.Min(Mathf.CeilToInt (alliedOdds),19);
-		int enemyPortion = Mathf.Max(Mathf.FloorToInt (enemyOdds),1);
-
-		// Allies damage enemies
-		if (alliedTroops.Units.Count > 0) {
-			Debug.Log ("PLAYER PHASE (" + alliedPortion + ")");
-			for (int i = 0; i<alliedPortion; i++) {
-				enemyTroops = damage (enemyTroops, alliedTroops.Units [i], alliedPortion);
-			}
-		}
-
-		if (enemyTroops.Units.Count > 0) {
-			Debug.Log("ENEMY PHASE ("+enemyPortion+")");
-			/// Enemies damage allies
-			for (int i = 0; i<enemyPortion; i++) {
-				alliedTroops = damage(alliedTroops, enemyTroops.Units[i], enemyPortion);
-			}
-		}
-
-		return new Tuple<Troop, Troop>(alliedTroops, enemyTroops);
-	}
-
-	Troop damage(Troop defenders, Unit attacker, int ammount){
-		int damage = attacker.RollAttackDie ();
-
-		for (int i = 0; i<ammount && defenders.Units.Count > 0; i++) {
-
-			int idx = Random.Range(0,(defenders.Units.Count-1));
-
-			Unit defender = defenders.Units[idx];
-			float rawDamage = damage*defender.Armor;
-
-			// Rock-paper-scisors bonuses
-			if(attacker.Type.Equals(Unit.KNIGHT) && defender.Type.Equals(Unit.SWORDMAN)){
-				rawDamage *= 1.3f;
-			}else if(attacker.Type.Equals(Unit.SWORDMAN) && defender.Type.Equals(Unit.ARCHER)){
-				rawDamage *= 1.25f;
-			}else if(attacker.Type.Equals(Unit.ARCHER) && defender.Type.Equals(Unit.KNIGHT)){
-				rawDamage *= 1.75f;
-			}
-
-			int damageDealt = Mathf.CeilToInt(rawDamage);
-
-			Debug.Log("A unit dealt "+damageDealt+"("+damage+"*"+defender.Armor+") damage!\n" +
-			          "Health: "+defender.Health+"->"+(defender.Health - damageDealt));
-
-			defender.Health -=  damageDealt;
-			if(defender.Health <= 0){
-				defenders.Units.RemoveAt(idx);
-				defenders.Deaths += 1;
-			}
-		}
-		return defenders;
-	}
-
 	/************************************************************************/
 }
 #endif 

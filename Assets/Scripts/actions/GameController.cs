@@ -35,6 +35,68 @@ public class GameController {
 		return player;
 	}
 
+	/*************************** Combat Script ******************************/
+	public static Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, float odds){
+		// Number of units in combat per turn
+		int garther = 20;
+		float alliedOdds = garther * odds;
+		float enemyOdds = garther * (1-odds);
+		int alliedPortion = Mathf.Min(Mathf.CeilToInt (alliedOdds),19);
+		int enemyPortion = Mathf.Max(Mathf.FloorToInt (enemyOdds),1);
+		
+		// Allies damage enemies
+		if (alliedTroops.Units.Count > 0) {
+			Debug.Log ("PLAYER PHASE (" + alliedPortion + ")");
+			for (int i = 0; i<alliedPortion; i++) {
+				enemyTroops = damage (enemyTroops, alliedTroops.Units [i], alliedPortion);
+			}
+		}
+		
+		if (enemyTroops.Units.Count > 0) {
+			Debug.Log("ENEMY PHASE ("+enemyPortion+")");
+			/// Enemies damage allies
+			for (int i = 0; i<enemyPortion; i++) {
+				alliedTroops = damage(alliedTroops, enemyTroops.Units[i], enemyPortion);
+			}
+		}
+		
+		return new Tuple<Troop, Troop>(alliedTroops, enemyTroops);
+	}
+	
+	public static Troop damage(Troop defenders, Unit attacker, int ammount){
+		int damage = attacker.RollAttackDie ();
+		
+		for (int i = 0; i<ammount && defenders.Units.Count > 0; i++) {
+			
+			int idx = Random.Range(0,(defenders.Units.Count-1));
+			
+			Unit defender = defenders.Units[idx];
+			float rawDamage = damage*defender.Armor;
+			
+			// Rock-paper-scisors bonuses
+			if(attacker.Type.Equals(Unit.KNIGHT) && defender.Type.Equals(Unit.SWORDMAN)){
+				rawDamage *= 1.3f;
+			}else if(attacker.Type.Equals(Unit.SWORDMAN) && defender.Type.Equals(Unit.ARCHER)){
+				rawDamage *= 1.25f;
+			}else if(attacker.Type.Equals(Unit.ARCHER) && defender.Type.Equals(Unit.KNIGHT)){
+				rawDamage *= 1.75f;
+			}
+			
+			int damageDealt = Mathf.CeilToInt(rawDamage);
+			
+			Debug.Log("A unit dealt "+damageDealt+"("+damage+"*"+defender.Armor+") damage!\n" +
+			          "Health: "+defender.Health+"->"+(defender.Health - damageDealt));
+			
+			defender.Health -=  damageDealt;
+			if(defender.Health <= 0){
+				defenders.Units.RemoveAt(idx);
+				defenders.Deaths += 1;
+			}
+		}
+		return defenders;
+	}
+	/************************************************************************/
+
 }
 
 public class Unit
@@ -166,4 +228,3 @@ public class Tuple<T1, T2>
 		Second = second;
 	}
 }
-

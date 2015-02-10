@@ -22,7 +22,7 @@ public class SlidingText : MonoBehaviour {
 
 		// fast mode vs. slow mode
 		//float smoothTime = 8.0f;
-		float smoothTime = 13.5f;
+		float smoothTime = 20.75f;
 
 		// sliding phase
 		Vector3 temp = gameObject.transform.position;

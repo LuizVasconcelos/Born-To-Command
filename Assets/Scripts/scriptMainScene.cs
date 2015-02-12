@@ -194,18 +194,18 @@ public class scriptMainScene : MonoBehaviour {
 								Vector3 currentPosition2 = leftSide.transform.position;
 								Vector3 target2 = new Vector3 ((-1.4f), leftSide.transform.position.y, leftSide.transform.position.z);
 								Vector3 velocity2 = new Vector3 (0.0f, 0.0f, 0.0f);
-								float smoothTime2 = 0.3f;
+								float smoothTime2 = 0.15f;
 
 								Vector3 currentPosition3 = rightSide.transform.position;
 								Vector3 target3 = new Vector3 (1.825f, rightSide.transform.position.y, rightSide.transform.position.z);
 								Vector3 velocity3 = new Vector3 (0.0f, 0.0f, 0.0f);
-								float smoothTime3 = 0.3f;
+								float smoothTime3 = 0.15f;
 
 								//Vector3 newScrollContentPosition = new Vector3((currentPosition2.x + rightSide.transform.position.x)/2, middle.transform.position.y, middle.transform.position.z);
 								Vector3 newScrollContentScale = new Vector3(middle.transform.localScale.x, 2.0f, middle.transform.localScale.z);
 								Vector3 currentScrollContentScale = new Vector3(middle.transform.localScale.x,middle.transform.localScale.y,middle.transform.localScale.z);
 								Vector3 velocity4 = new Vector3 (0.0f, 0.0f, 0.0f);
-								float smoothTime4 = 0.3f;
+								float smoothTime4 = 0.15f;
 
 								if((leftSide.transform.position.x >= (-1.39f))
 					   				&& (rightSide.transform.position.x <= 1.815f)) {

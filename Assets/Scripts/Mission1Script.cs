@@ -397,10 +397,11 @@ public class Mission1Script : MonoBehaviour {
 	}
 
 	void show(int idx, int route){
+		Debug.Log ("Show");
 		GameObject[] labels =  GameObject.FindGameObjectsWithTag("Route-"+route);
 
 		Vector3 pos = labels[idx].transform.position;
-		pos.z = 0.0f;
+		pos.z = -0.05f;
 		labels[idx].transform.position = pos;
 	}
 

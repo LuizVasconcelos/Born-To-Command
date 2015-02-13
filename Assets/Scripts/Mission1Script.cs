@@ -46,6 +46,7 @@ public class Mission1Script : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		GameObject.Find("ParticleSystem").particleSystem.Stop();
 		village3Clicked = false;
 		castleClicked = false;
 		startTime = Time.time;
@@ -175,6 +176,7 @@ public class Mission1Script : MonoBehaviour {
 		/**************************** PHASE 3 ********************************/
 		if (villageChoice > 0) {
 			if(villageChoice == ATTACK_VILLAGE){
+				GameObject.Find("ParticleSystem").particleSystem.Play();
 				int total = localPlayer.Units.Units.Count+villageTroops.Units.Count;
 				float odds = (float)localPlayer.Units.Units.Count/(float)total;
 				//Debug.Log("total::odds = "+total+"::"+odds);
@@ -188,6 +190,7 @@ public class Mission1Script : MonoBehaviour {
 				// Check end of combat
 				if(localPlayer.Units.Units.Count == 0){
 					// Game over :(
+					GameObject.Find("ParticleSystem").particleSystem.Stop();
 					gameOver("Your forces have been defeated by the forest folk!", false);
 
 				}else if(villageTroops.Units.Count == 0){
@@ -197,6 +200,7 @@ public class Mission1Script : MonoBehaviour {
 					localPlayer.Food += 6;
 					localPlayer.Gold += 500;
 					villageChoice = 0;
+					GameObject.Find("ParticleSystem").particleSystem.Stop();
 				}
 			}else if(villageChoice == PAY_VILLAGE){
 				isGoClicked = true;

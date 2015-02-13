@@ -455,7 +455,7 @@ void OnGoClicked(){
 	if (!mahajaClicked && !icegardClicked) {
 		if (EditorUtility.DisplayDialog ("No route selected!", //title
 		                                 "You must select a route to one of the castles.\n" +
-		                                 "You can either go through the outpost village ou direct to the desired castle", // text
+		                                 "You can either go through the outpost village or direct to the desired castle.", // text
 		                                 "OK")) { // yes, no
 			//isGoClicked = true;
 		}

@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEditor;
-
+#endif
+#if UNITY_EDITOR
 public class scriptMainScene : MonoBehaviour {
 
 	private bool isBlacksmithClicked;
@@ -273,3 +275,4 @@ public class scriptMainScene : MonoBehaviour {
 				}
 	}
 }
+#endif

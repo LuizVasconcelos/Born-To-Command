@@ -15,7 +15,7 @@ public class Weapon
 	private int Payload; 
 
 	// For initiate the weapons in the inventary	
-	Weapon(string TypeWeapon, int Payload, float PriceOfPurchase, float PriceOfSelling){
+	public Weapon(string TypeWeapon, int Payload, float PriceOfPurchase, float PriceOfSelling){
 		this.TypeWeapon = TypeWeapon;
 		this.Payload = Payload;
 		this.PriceOfPurchase = PriceOfPurchase;

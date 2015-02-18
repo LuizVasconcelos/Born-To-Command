@@ -23,6 +23,12 @@ public class Mission1Script : MonoBehaviour {
 	private Vector3 originalScrollPosition1;
 	private Vector3 originalScrollPosition2;
 
+	//Tooltip variables
+	private GameObject tipVillage;
+	private GameObject tipCastle;
+	private GameObject textTipVillage;
+	private GameObject textTipCastle;
+
 	// Players variables
 	private Player localPlayer;
 	private int playerTroopsMax;
@@ -85,27 +91,32 @@ public class Mission1Script : MonoBehaviour {
 
 		// Tutorial
 
-		mainChar = GameObject.Find ("main2");
-		tutorialScroll = GameObject.Find ("scrollTutorial2");
-		originalCharPosition2 = mainChar.transform.position;
-		originalScrollPosition2 = tutorialScroll.transform.position;
+		this.mainChar = GameObject.Find ("main2");
+		this.tutorialScroll = GameObject.Find ("scrollTutorial2");
+		this.originalCharPosition2 = mainChar.transform.position;
+		this.originalScrollPosition2 = tutorialScroll.transform.position;
 
-		mainChar = GameObject.Find ("main1");
-		tutorialScroll = GameObject.Find ("scrollTutorial");
-		tutorialOn = false;
+		this.mainChar = GameObject.Find ("main1");
+		this.tutorialScroll = GameObject.Find ("scrollTutorial");
+		this.tutorialOn = false;
 		//tutorialPhase = 0;
-		charOnPos = false;
-		scrollOnPos = false;
-		charOnPos2 = false;
-		scrollOnPos2 = false;
+		this.charOnPos = false;
+		this.scrollOnPos = false;
+		this.charOnPos2 = false;
+		this.scrollOnPos2 = false;
 
 		//NAO MEXER NISSO DAQUI
-		originalCharPosition1 = mainChar.transform.position;
+		this.originalCharPosition1 = mainChar.transform.position;
 		//originalCharPosition2 = GameObject.Find("main2").transform.position;
-		originalScrollPosition1 = tutorialScroll.transform.position;
+		this.originalScrollPosition1 = tutorialScroll.transform.position;
 		//originalScrollPosition2 = GameObject.Find("scrollTutorial2").transform.position;
 		///////////////////////
 
+		// Coisas do tooltip
+		this.tipCastle = GameObject.Find ("tooltipCastle");
+		this.tipVillage = GameObject.Find ("tooltipVillage");
+		this.textTipCastle = GameObject.Find ("tooltextCastle");
+		this.textTipVillage = GameObject.Find ("tooltextVillage");
 	}
 	
 	// Update is called once per frame
@@ -700,5 +711,12 @@ public class Mission1Script : MonoBehaviour {
 		}
 	}
 	/************************************************************************/
+
+	void OnMouseOver() {
+		Debug.Log ("mouse over");		
+	}
+	void OnMouseExit() {
+		Debug.Log ("mose exit");
+	}
 }
 #endif 

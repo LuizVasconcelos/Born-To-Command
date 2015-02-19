@@ -196,6 +196,22 @@ public class Mission1Script : MonoBehaviour {
 
 			case 2:
 				if(charOnPos && scrollOnPos) {
+					Vector3 auxPos  = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+					tutorialText.transform.position = auxPos;
+					tutorialText = GameObject.Find ("tutorialText3");
+					Vector3 labelPosition = tutorialText.transform.position;
+					Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+					
+					//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+					tutorialText.transform.position = newLabelPosition;
+					
+					if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+				}
+
+				break;
+			
+			case 3:
+				if(charOnPos && scrollOnPos) {
 					Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
 					tutorialText.transform.position = auxPos;
 					
@@ -210,7 +226,7 @@ public class Mission1Script : MonoBehaviour {
 				}
 
 				if(charOnPos2 && scrollOnPos2) {
-					tutorialText = GameObject.Find ("tutorialText3");
+					tutorialText = GameObject.Find ("tutorialText4");
 					Vector3 labelPosition = tutorialText.transform.position;
 					Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
 					//Debug.Log ("dsadsa");
@@ -245,24 +261,8 @@ public class Mission1Script : MonoBehaviour {
 
 				break;
 
-			case 3:
-				if(charOnPos2 && scrollOnPos2) {
-					Vector3 auxPos  = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
-					tutorialText.transform.position = auxPos;
-					tutorialText = GameObject.Find ("tutorialText4");
-					Vector3 labelPosition = tutorialText.transform.position;
-					Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
-
-					tutorialText.transform.position = newLabelPosition;
-					
-					if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
-				}
-
-				break;
-
 			case 4:
-				//FAZ ALGO AQUI QUANDO TERMINAR O TUTORIAL
-				if(tutorialOn) {
+				if(charOnPos2 && scrollOnPos2) {
 					Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
 					tutorialText.transform.position = auxPos;
 					
@@ -271,6 +271,57 @@ public class Mission1Script : MonoBehaviour {
 					
 					charOnPos2 = false;
 					scrollOnPos2 = false;
+					
+					mainChar = GameObject.Find("main1");
+					tutorialScroll = GameObject.Find("scrollTutorial");
+				}
+
+				if(charOnPos && scrollOnPos) {
+					tutorialText = GameObject.Find ("tutorialText5");
+					Vector3 labelPosition = tutorialText.transform.position;
+					Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+					
+					//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+					tutorialText.transform.position = newLabelPosition;
+					
+					if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+				} else {
+					Vector3 charPos = mainChar.transform.position;
+					Vector3 scrollPos = tutorialScroll.transform.position;
+					
+					Vector3 newCharPos = new Vector3(1.2f, charPos.y, charPos.z);
+					Vector3 newScrollPos = new Vector3(-0.2f, scrollPos.y, scrollPos.z);
+					
+					Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+					float smoothTime = 0.15f;
+					
+					if(mainChar.transform.position.x >= (1.2f) && !charOnPos && !scrollOnPos) {
+						mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+					} else {
+						charOnPos = true;
+						//Debug.Log("char on pos");
+					}
+					
+					if(tutorialScroll.transform.position.x >= (-0.1f) && !scrollOnPos) {
+						tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+					} else {
+						scrollOnPos = true;
+					}
+				}
+
+				break;
+
+			case 5:
+				//FAZ ALGO AQUI QUANDO TERMINAR O TUTORIAL
+				if(tutorialOn) {
+					Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+					tutorialText.transform.position = auxPos;
+					
+					mainChar.transform.position = originalCharPosition1;
+					tutorialScroll.transform.position = originalScrollPosition1;
+					
+					charOnPos = false;
+					scrollOnPos = false;
 
 					tutorialOn = false;
 					tutorialPhase = 0;

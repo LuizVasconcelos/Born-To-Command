@@ -36,27 +36,33 @@ public class GameController {
 	}
 
 	/*************************** Combat Script ******************************/
-	public static Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, float odds){
-		// Number of units in combat per turn
-		int garther = 20;
-		float alliedOdds = garther * odds;
-		float enemyOdds = garther * (1-odds);
-		int alliedPortion = Mathf.Min(Mathf.CeilToInt (alliedOdds),19);
-		int enemyPortion = Mathf.Max(Mathf.FloorToInt (enemyOdds),1);
-		
-		// Allies damage enemies
-		if (alliedTroops.Units.Count > 0) {
-			Debug.Log ("PLAYER PHASE (" + alliedPortion + ")");
-			for (int i = 0; i<alliedPortion; i++) {
-				enemyTroops = damage (enemyTroops, alliedTroops.Units [i], alliedPortion);
-			}
-		}
-		
-		if (enemyTroops.Units.Count > 0) {
-			Debug.Log("ENEMY PHASE ("+enemyPortion+")");
-			/// Enemies damage allies
-			for (int i = 0; i<enemyPortion; i++) {
-				alliedTroops = damage(alliedTroops, enemyTroops.Units[i], enemyPortion);
+	public static Tuple<Troop, Troop> combatTurn(Troop alliedTroops, Troop enemyTroops, Tuple<int,int> odds){
+		int alliedIDX = 0;
+		int enemyIDX = 0;
+		bool alliedTurn = true;
+
+		for (int i = 0; i<(alliedTroops.Units.Count+enemyTroops.Units.Count); ) {
+			// Switch between turns
+			if(alliedTurn){
+				alliedTurn = false;
+
+				if(alliedIDX<alliedTroops.Units.Count){
+					Unit u = alliedTroops.Units[alliedIDX];
+					enemyTroops = damage(enemyTroops, u, odds.First);
+					alliedIDX++;
+
+					i++;
+				}
+			}else{
+				alliedTurn = true;
+
+				if(enemyIDX<enemyTroops.Units.Count){
+					Unit u = enemyTroops.Units[enemyIDX];
+					alliedTroops = damage(alliedTroops, u, odds.Second);
+					enemyIDX++;
+
+					i++;
+				}
 			}
 		}
 		
@@ -64,7 +70,7 @@ public class GameController {
 	}
 	
 	public static Troop damage(Troop defenders, Unit attacker, int ammount){
-		int damage = attacker.RollAttackDie ();
+		int damage = attacker.Damage ();
 		
 		for (int i = 0; i<ammount && defenders.Units.Count > 0; i++) {
 			
@@ -102,22 +108,29 @@ public class GameController {
 public class Unit
 {
 
-	public Unit(string Type, int Health, int AttackDie, int NumDie, float Armor){
+	public Unit(string Type, int Health, Tuple<int, int> Attack, float Armor){
 		this.Type = Type;
 		this.Health = Health;
-		this.AttackDie = AttackDie;
-		this.NumDie = NumDie;
+		this.Attack = Attack;
 		this.Armor = Armor;
 	}
 
 	public Unit(){}
 
-	public int RollAttackDie(){
-		int result = 1;
-		for (int i = 1; i<this.NumDie; i++) {
-			result += Random.Range(1, this.AttackDie);
-		}
-		return result;
+	public int Damage(){
+		return Random.Range (this.Attack.First, this.Attack.Second);
+	}
+
+	public static Unit newSwordman(){
+		return new Unit(Unit.SWORDMAN,100,new Tuple<int, int>(20,35),0.2f);
+	}
+
+	public static Unit newKnight(){
+		return new Unit(Unit.KNIGHT,100,new Tuple<int, int>(25,30),0.35f);
+	}
+
+	public static Unit newArcher(){
+		return new Unit(Unit.ARCHER,100,new Tuple<int, int>(10,100),0.05f);
 	}
 
 	public const string SWORDMAN = "Swordman";
@@ -126,8 +139,7 @@ public class Unit
 
 	public string Type { get; set; }
 	public int Health { get; set; }
-	public int AttackDie { get; set; }
-	public int NumDie { get; set; }
+	public Tuple<int, int> Attack { get; set; }
 	public float Armor { get; set; }
 }
 
@@ -161,20 +173,17 @@ public class Player
 	public static Troop generateTroop(int size){
 		Troop units = new Troop (new List<Unit>(size));
 		for (int i = 0; i<size; i++) {
-			int type = Random.Range(1,4);
+			int type = Random.Range(1,3);
 			Unit u = null;
 			switch(type){
 			case 1:
-				u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
+				u = Unit.newSwordman();
 				break;
 			case 2:
-				u = new Unit(Unit.KNIGHT,100,2,35,0.35f);
+				u = Unit.newKnight();
 				break;
 			case 3:
-				u = new Unit(Unit.ARCHER,100,100,1,0.05f);
-				break;
-			default:
-				u = new Unit(Unit.SWORDMAN,100,5,15,0.2f);
+				u = Unit.newArcher();
 				break;
 			}
 			/*Debug.Log("Unit:: \n" +
@@ -183,7 +192,39 @@ public class Player
 			    "Armor: "+u.Armor);*/
 			units.Units.Add(u);
 		}
-		
+
+		return units;
+	}
+
+	public static Troop generateTroop(int swordmans, int knights, int archers){
+		Troop units = new Troop (new List<Unit> (swordmans + knights + archers));
+		for (int i = 0; i<swordmans; i++) {
+				Unit u = Unit.newSwordman ();
+				/*Debug.Log("Unit:: \n" +
+		"Health: "+u.Health+"\n" +
+	    "Attack: "+u.Attack+"\n" +
+	    "Armor: "+u.Armor);*/
+				units.Units.Add (u);
+		}
+
+		for (int i = 0; i<knights; i++) {
+				Unit u = Unit.newKnight ();
+				/*Debug.Log("Unit:: \n" +
+		"Health: "+u.Health+"\n" +
+	    "Attack: "+u.Attack+"\n" +
+	    "Armor: "+u.Armor);*/
+				units.Units.Add (u);
+		}
+
+		for (int i = 0; i<archers; i++) {
+				Unit u = Unit.newArcher ();
+				/*Debug.Log("Unit:: \n" +
+		"Health: "+u.Health+"\n" +
+	    "Attack: "+u.Attack+"\n" +
+	    "Armor: "+u.Armor);*/
+				units.Units.Add (u);
+		}
+
 		return units;
 	}
 	

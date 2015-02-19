@@ -434,9 +434,9 @@ public class Mission1Script : MonoBehaviour {
 		if (villageChoice > 0) {
 			if(villageChoice == ATTACK_VILLAGE){
 				GameObject.Find("ParticleSystem").particleSystem.Play();
-				int total = localPlayer.Units.Units.Count+villageTroops.Units.Count;
-				float odds = (float)localPlayer.Units.Units.Count/(float)total;
-				//Debug.Log("total::odds = "+total+"::"+odds);
+
+				Tuple<int, int> odds = new Tuple<int,int>(1,1);
+
 				Tuple<Troop, Troop> result = GameController.combatTurn(localPlayer.Units,villageTroops,odds);
 				localPlayer.Units = result.First;
 				villageTroops = result.Second;
@@ -468,10 +468,9 @@ public class Mission1Script : MonoBehaviour {
 		}
 		if (castleChoice > 0) {
 			if(castleChoice == ATTACK_CASTLE){
-				int total = localPlayer.Units.Units.Count+castleTroops.Units.Count;
-				float odds = (float)localPlayer.Units.Units.Count/(float)total;
-				odds = Mathf.Max(odds, 0.35f);
-				//Debug.Log("total::odds = "+total+"::"+odds);
+
+				Tuple<int, int> odds = new Tuple<int,int>(1,3);
+
 				Tuple<Troop, Troop> result = GameController.combatTurn(localPlayer.Units,castleTroops,odds);
 				localPlayer.Units = result.First;
 				castleTroops = result.Second;

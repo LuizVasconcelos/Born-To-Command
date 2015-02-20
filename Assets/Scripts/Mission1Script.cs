@@ -8,7 +8,7 @@ using UnityEditor;
 #if UNITY_EDITOR
 public class Mission1Script : MonoBehaviour {
 
-	// Tutorial variables
+	// Dialogs variables
 	private GameObject mainChar;
 	private GameObject tutorialScroll;
 	private bool tutorialOn;
@@ -24,10 +24,10 @@ public class Mission1Script : MonoBehaviour {
 	private Vector3 originalScrollPosition2;
 
 	//Tooltip variables
-	private GameObject tipVillage;
-	private GameObject tipCastle;
-	private GameObject textTipVillage;
-	private GameObject textTipCastle;
+	//private GameObject tipVillage;
+	//private GameObject tipCastle;
+	//private GameObject textTipVillage;
+	//private GameObject textTipCastle;
 
 	// Players variables
 	private Player localPlayer;
@@ -89,7 +89,7 @@ public class Mission1Script : MonoBehaviour {
 
 		labelsCrossed = 0;
 
-		// Tutorial
+		// Dialogs
 
 		this.mainChar = GameObject.Find ("main2");
 		this.tutorialScroll = GameObject.Find ("scrollTutorial2");
@@ -98,8 +98,8 @@ public class Mission1Script : MonoBehaviour {
 
 		this.mainChar = GameObject.Find ("main1");
 		this.tutorialScroll = GameObject.Find ("scrollTutorial");
-		this.tutorialOn = false;
-		//tutorialPhase = 0;
+		this.tutorialOn = true;
+		tutorialPhase = 0;
 		this.charOnPos = false;
 		this.scrollOnPos = false;
 		this.charOnPos2 = false;
@@ -113,10 +113,10 @@ public class Mission1Script : MonoBehaviour {
 		///////////////////////
 
 		// Coisas do tooltip
-		this.tipCastle = GameObject.Find ("tooltipCastle");
-		this.tipVillage = GameObject.Find ("tooltipVillage");
-		this.textTipCastle = GameObject.Find ("tooltextCastle");
-		this.textTipVillage = GameObject.Find ("tooltextVillage");
+		//this.tipCastle = GameObject.Find ("tooltipCastle");
+		//this.tipVillage = GameObject.Find ("tooltipVillage");
+		//this.textTipCastle = GameObject.Find ("tooltextCastle");
+		//this.textTipVillage = GameObject.Find ("tooltextVillage");
 	}
 	
 	// Update is called once per frame
@@ -129,7 +129,7 @@ public class Mission1Script : MonoBehaviour {
 
 		//Debug.Log (tutorialOn);
 		/**************************** TUTORIAL *******************************/
-		if(Input.GetKeyDown(KeyCode.T)) {
+		/*if(Input.GetKeyDown(KeyCode.T)) {
 			//tutorialOn = !tutorialOn;
 			tutorialOn = true;
 			tutorialPhase = 0; // start point
@@ -138,7 +138,7 @@ public class Mission1Script : MonoBehaviour {
 
 		if(Input.GetKeyDown(KeyCode.Escape)) {
 			if(tutorialOn) Application.LoadLevel(Application.loadedLevel);
-		}
+		}*/
 
 		if (tutorialOn) {
 			switch (tutorialPhase) {
@@ -324,9 +324,46 @@ public class Mission1Script : MonoBehaviour {
 					scrollOnPos = false;
 
 					tutorialOn = false;
-					tutorialPhase = 0;
 				}
 				//Application.LoadLevel("mainScene");
+				break;
+
+			case 6:
+				if(charOnPos && scrollOnPos) {
+					tutorialText = GameObject.Find ("tutorialText6");
+					Vector3 labelPosition = tutorialText.transform.position;
+					Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+					
+					//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+					tutorialText.transform.position = newLabelPosition;
+					
+					if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+				} else {
+					Vector3 charPos = mainChar.transform.position;
+					Vector3 scrollPos = tutorialScroll.transform.position;
+					
+					Vector3 newCharPos = new Vector3(1.2f, charPos.y, charPos.z);
+					Vector3 newScrollPos = new Vector3(-0.2f, scrollPos.y, scrollPos.z);
+					
+					Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+					float smoothTime = 0.15f;
+					
+					if(mainChar.transform.position.x >= (1.2f) && !charOnPos && !scrollOnPos) {
+						mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+					} else {
+						charOnPos = true;
+					}
+					
+					if(tutorialScroll.transform.position.x >= (-0.1f) && !scrollOnPos) {
+						tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+					} else {
+						scrollOnPos = true;
+					}
+				}
+
+				break;
+			case 7:
+				Application.LoadLevel("mainScene");
 				break;
 			}
 		}
@@ -394,7 +431,7 @@ public class Mission1Script : MonoBehaviour {
 				if(step2){
 					bool stopped = moveTo (ROUTE_VILLAGE_TO_CASTLE);
 
-					if(stopped){
+					if(stopped && castleChoice == 0){
 						// Here starts the castle script per se
 						castleEvent();
 						
@@ -419,7 +456,7 @@ public class Mission1Script : MonoBehaviour {
 			}else{
 				bool stopped = moveTo (ROUTE_CAMP_TO_CASTLE);
 
-				if(stopped){
+				if(stopped && castleChoice == 0){
 					// Here starts the castle script per se
 					castleEvent();
 
@@ -490,7 +527,7 @@ public class Mission1Script : MonoBehaviour {
 					isGoClicked = true;
 					localPlayer.Food += 10;
 					localPlayer.Gold += 1500;
-					castleChoice = 0;
+					castleChoice = -1;
 				}
 			}else if(castleChoice == DUEL_CASTLE){
 				// Roll a die
@@ -514,6 +551,7 @@ public class Mission1Script : MonoBehaviour {
 	void gameOver(string msg, bool win){
 		string title = "";
 		string ok = "";
+		castleChoice = -1;
 
 		if (win) {
 			title = "You win!";
@@ -526,8 +564,10 @@ public class Mission1Script : MonoBehaviour {
 		if (EditorUtility.DisplayDialog (title, //title
 		                                 msg, // text
 		                                 ok)) { // yes, no
-			Application.LoadLevel ("mainScene");
+			//Application.LoadLevel ("mainScene");
 		}
+		tutorialOn = true;
+		tutorialPhase++;
 	}
 
 	void starving(){

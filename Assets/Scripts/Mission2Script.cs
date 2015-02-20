@@ -8,6 +8,24 @@ using UnityEditor;
 #if UNITY_EDITOR
 public class Mission2Script : MonoBehaviour {
 	
+	// Dialogs variables
+	private GameObject mainChar;
+	private GameObject tutorialScroll;
+	private bool tutorialOn;
+	private bool charOnPos;
+	private bool scrollOnPos;
+	private bool charOnPos2;
+	private bool scrollOnPos2;
+	private int tutorialPhase;
+	private GameObject tutorialText;
+	private Vector3 originalCharPosition1;
+	private Vector3 originalCharPosition2;
+	private Vector3 originalScrollPosition1;
+	private Vector3 originalScrollPosition2;
+
+	// aux boolean
+	private bool canContinue;
+
 	// Players variables
 	private Player localPlayer;
 	private int playerTroopsMax;
@@ -98,6 +116,31 @@ public class Mission2Script : MonoBehaviour {
 		halt = true;
 		
 		labelsCrossed = 0;
+
+		// Dialogs
+
+		this.mainChar = GameObject.Find ("main2");
+		this.tutorialScroll = GameObject.Find ("scrollTutorial2");
+		this.originalCharPosition2 = mainChar.transform.position;
+		this.originalScrollPosition2 = tutorialScroll.transform.position;
+
+		this.mainChar = GameObject.Find ("main1");
+		this.tutorialScroll = GameObject.Find ("scrollTutorial");
+		this.tutorialOn = true;
+		tutorialPhase = 0;
+		this.charOnPos = false;
+		this.scrollOnPos = false;
+		this.charOnPos2 = false;
+		this.scrollOnPos2 = false;
+
+		//NAO MEXER NISSO DAQUI
+		this.originalCharPosition1 = mainChar.transform.position;
+		//originalCharPosition2 = GameObject.Find("main2").transform.position;
+		this.originalScrollPosition1 = tutorialScroll.transform.position;
+		//originalScrollPosition2 = GameObject.Find("scrollTutorial2").transform.position;
+		///////////////////////
+
+		canContinue = false;
 	}
 	
 	// Update is called once per frame
@@ -108,8 +151,399 @@ public class Mission2Script : MonoBehaviour {
 		updateLog ();
 		updateBars ();
 		
+		if(tutorialOn) {
+			switch(tutorialPhase) {
+				case 0:
+					if(charOnPos && scrollOnPos) {
+						tutorialText = GameObject.Find ("tutorialText1");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+					
+						//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+						tutorialText.transform.position = newLabelPosition;
+
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+
+						Vector3 newCharPos = new Vector3(1.2f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(-0.2f, scrollPos.y, scrollPos.z);
+
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+
+						if(mainChar.transform.position.x >= (1.2f) && !charOnPos && !scrollOnPos) {
+							mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos = true;
+							//Debug.Log("char on pos");
+						}
+
+						if(tutorialScroll.transform.position.x >= (-0.1f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos = true;
+						}
+					}
+
+				break;
+
+				case 1:
+					if(charOnPos && scrollOnPos) {
+						Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+						tutorialText.transform.position = auxPos;
+					
+						mainChar.transform.position = originalCharPosition1;
+						tutorialScroll.transform.position = originalScrollPosition1;
+
+						charOnPos = false;
+						scrollOnPos = false;
+					
+						mainChar = GameObject.Find("main2");
+						tutorialScroll = GameObject.Find("scrollTutorial2");
+					}
+
+					if(charOnPos2 && scrollOnPos2) {
+						tutorialText = GameObject.Find ("tutorialText2");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+						//Debug.Log ("dsadsa");
+						tutorialText.transform.position = newLabelPosition;
+
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+					
+						Vector3 newCharPos = new Vector3(-0.9f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(0.5f, scrollPos.y, scrollPos.z);
+					
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+					
+						if(mainChar.transform.position.x <= (-0.95f) && !charOnPos && !scrollOnPos) {
+						mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos2 = true;
+							//Debug.Log("char 2");
+						}
+					
+						if(tutorialScroll.transform.position.x <= (0.3f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos2 = true;
+							//Debug.Log("scroll 2");
+						}
+
+					}
+				break;
+
+				case 2:
+					if(charOnPos2 && scrollOnPos2) {
+						Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+						tutorialText.transform.position = auxPos;
+					
+						mainChar.transform.position = originalCharPosition2;
+						tutorialScroll.transform.position = originalScrollPosition2;
+					
+						charOnPos2 = false;
+						scrollOnPos2 = false;
+					
+						mainChar = GameObject.Find("main1");
+						tutorialScroll = GameObject.Find("scrollTutorial");
+					}
+
+					if(charOnPos && scrollOnPos) {
+						tutorialText = GameObject.Find ("tutorialText3");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+					
+						//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+						tutorialText.transform.position = newLabelPosition;
+					
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+					
+						Vector3 newCharPos = new Vector3(1.2f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(-0.2f, scrollPos.y, scrollPos.z);
+					
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+					
+						if(mainChar.transform.position.x >= (1.2f) && !charOnPos && !scrollOnPos) {
+							mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos = true;
+							//Debug.Log("char on pos");
+						}
+					
+						if(tutorialScroll.transform.position.x >= (-0.1f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos = true;
+						}
+					}
+				break;
+
+				case 3:
+					if(charOnPos && scrollOnPos) {
+						Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+						tutorialText.transform.position = auxPos;
+					
+						mainChar.transform.position = originalCharPosition1;
+						tutorialScroll.transform.position = originalScrollPosition1;
+
+						charOnPos = false;
+						scrollOnPos = false;
+					
+						mainChar = GameObject.Find("main2");
+						tutorialScroll = GameObject.Find("scrollTutorial2");
+					}
+
+					if(charOnPos2 && scrollOnPos2) {
+						tutorialText = GameObject.Find ("tutorialText4");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+						//Debug.Log ("dsadsa");
+						tutorialText.transform.position = newLabelPosition;
+
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+						
+						Vector3 newCharPos = new Vector3(-0.9f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(0.5f, scrollPos.y, scrollPos.z);
+						
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+						
+						if(mainChar.transform.position.x <= (-0.95f) && !charOnPos && !scrollOnPos) {
+							mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos2 = true;
+							//Debug.Log("char 2");
+						}
+						
+						if(tutorialScroll.transform.position.x <= (0.3f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos2 = true;
+							//Debug.Log("scroll 2");
+						}
+					}
+				break;
+
+				case 4:
+					if(charOnPos2 && scrollOnPos2) {
+						Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+						tutorialText.transform.position = auxPos;
+						
+						mainChar.transform.position = originalCharPosition2;
+						tutorialScroll.transform.position = originalScrollPosition2;
+						
+						charOnPos2 = false;
+						scrollOnPos2 = false;
+						
+						mainChar = GameObject.Find("main1");
+						tutorialScroll = GameObject.Find("scrollTutorial");
+					}
+
+					if(charOnPos && scrollOnPos) {
+						tutorialText = GameObject.Find ("tutorialText5");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+						
+						//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+						tutorialText.transform.position = newLabelPosition;
+						
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+						
+						Vector3 newCharPos = new Vector3(1.2f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(-0.2f, scrollPos.y, scrollPos.z);
+						
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+						
+						if(mainChar.transform.position.x >= (1.2f) && !charOnPos && !scrollOnPos) {
+							mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos = true;
+							//Debug.Log("char on pos");
+						}
+						
+						if(tutorialScroll.transform.position.x >= (-0.1f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos = true;
+						}
+					}
+				break;
+
+				case 5:
+					if(charOnPos && scrollOnPos) {
+						Vector3 auxPos  = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+						tutorialText.transform.position = auxPos;
+						tutorialText = GameObject.Find ("tutorialText6");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+							
+						//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+						tutorialText.transform.position = newLabelPosition;
+							
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					}
+				break;
+
+				case 6:
+					if(tutorialOn) {
+						Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+						tutorialText.transform.position = auxPos;
+						
+						mainChar.transform.position = originalCharPosition1;
+						tutorialScroll.transform.position = originalScrollPosition1;
+						
+						charOnPos = false;
+						scrollOnPos = false;
+
+						tutorialOn = false;
+
+						canContinue = true;
+					}
+				break;
+
+				case 7: // se atacou os nortenhos
+					if(charOnPos && scrollOnPos) {
+						tutorialText = GameObject.Find ("tutorialText7");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+						
+						//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+						tutorialText.transform.position = newLabelPosition;
+						
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase = 10;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+						
+						Vector3 newCharPos = new Vector3(1.2f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(-0.2f, scrollPos.y, scrollPos.z);
+						
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+						
+						if(mainChar.transform.position.x >= (1.2f) && !charOnPos && !scrollOnPos) {
+							mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos = true;
+						}
+						
+						if(tutorialScroll.transform.position.x >= (-0.1f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos = true;
+						}
+					}
+				break;
+
+				case 8: // se atacou os mahaitas
+					if(charOnPos && scrollOnPos) {
+						tutorialText = GameObject.Find ("tutorialText8");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+						
+						//tutorialText.transform.position = Vector3.Lerp(labelPosition, newLabelPosition, 0.1f);
+						tutorialText.transform.position = newLabelPosition;
+						
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+						
+						Vector3 newCharPos = new Vector3(1.2f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(-0.2f, scrollPos.y, scrollPos.z);
+						
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+						
+						if(mainChar.transform.position.x >= (1.2f) && !charOnPos && !scrollOnPos) {
+							mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos = true;
+						}
+						
+						if(tutorialScroll.transform.position.x >= (-0.1f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos = true;
+						}
+					}
+				break;
+
+			case 9:
+				if(charOnPos && scrollOnPos) {
+						Vector3 auxPos = new Vector3(tutorialText.transform.position.x, tutorialText.transform.position.y, 1.0f);
+						tutorialText.transform.position = auxPos;
+					
+						mainChar.transform.position = originalCharPosition1;
+						tutorialScroll.transform.position = originalScrollPosition1;
+
+						charOnPos = false;
+						scrollOnPos = false;
+					
+						mainChar = GameObject.Find("refem");
+						tutorialScroll = GameObject.Find("scrollTutorial2");
+					}
+
+					if(charOnPos2 && scrollOnPos2) {
+						tutorialText = GameObject.Find ("tutorialText9");
+						Vector3 labelPosition = tutorialText.transform.position;
+						Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
+						//Debug.Log ("dsadsa");
+						tutorialText.transform.position = newLabelPosition;
+
+						if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
+					} else {
+						Vector3 charPos = mainChar.transform.position;
+						Vector3 scrollPos = tutorialScroll.transform.position;
+						
+						Vector3 newCharPos = new Vector3(-0.9f, charPos.y, charPos.z);
+						Vector3 newScrollPos = new Vector3(0.5f, scrollPos.y, scrollPos.z);
+						
+						Vector3 velocity = new Vector3 (0.0f, 0.0f, 0.0f);
+						float smoothTime = 0.15f;
+						
+						if(mainChar.transform.position.x <= (-0.95f) && !charOnPos && !scrollOnPos) {
+							mainChar.transform.position = Vector3.Lerp(charPos, newCharPos, Time.deltaTime * 2.0f);
+						} else {
+							charOnPos2 = true;
+							//Debug.Log("char 2");
+						}
+						
+						if(tutorialScroll.transform.position.x <= (0.3f) && !scrollOnPos) {
+							tutorialScroll.transform.position = Vector3.SmoothDamp(scrollPos, newScrollPos, ref velocity, smoothTime);
+						} else {
+							scrollOnPos2 = true;
+							//Debug.Log("scroll 2");
+						}
+					}
+			break;
+
+			case 10:
+				Application.LoadLevel("mainScene");
+				break;
+			}
+		}
+
+		if(!canContinue) return;
+
 		/**************************** PHASE 1 ********************************/
-		
 		// Lines exposition
 		if (outpostClicked && index >= 0) {
 			if(icegardClicked){
@@ -392,7 +826,8 @@ public class Mission2Script : MonoBehaviour {
 					// Call aftermatch event
 					IcegardEvent();
 				}else{
-					// Win :)	
+					// Win :)
+					tutorialPhase = 7;
 					gameOver("You defeated the castellan forces! The castle is yours.", true);
 				}
 			}
@@ -435,7 +870,8 @@ public class Mission2Script : MonoBehaviour {
 					// Call aftermatch event
 					MahajaEvent();
 				}else{
-					// Win :)	
+					// Win :)
+					tutorialPhase = 8;
 					gameOver("You defeated the castellan forces! The castle is yours.", true);
 				}
 			}
@@ -462,8 +898,10 @@ public class Mission2Script : MonoBehaviour {
 		if (EditorUtility.DisplayDialog (title, //title
 		                                 msg, // text
 		                                 ok)) { // yes, no
-			Application.LoadLevel ("mainScene");
+			//Application.LoadLevel ("mainScene");
 		}
+		tutorialOn = true;
+		canContinue = false;
 	}
 
 	void starving(){

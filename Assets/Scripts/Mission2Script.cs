@@ -899,9 +899,9 @@ public class Mission2Script : MonoBehaviour {
 		                                 msg, // text
 		                                 ok)) { // yes, no
 			//Application.LoadLevel ("mainScene");
+			tutorialOn = true;
+			canContinue = false;
 		}
-		tutorialOn = true;
-		canContinue = false;
 	}
 
 	void starving(){
@@ -1140,6 +1140,7 @@ public class Mission2Script : MonoBehaviour {
 		                                 "You can concede the outpost to them and avoid more battles, or attack them as well.",
 		                                 "Concede", "Attack")) { // yes, no
 			mahajaChoice = CONCEDE;
+			tutorialPhase = 8;
 			gameOver("You defeated the castellan forces! The castle is yours.", true);
 		}else{
 			mahajaChoice = ATTACK;
@@ -1155,6 +1156,7 @@ public class Mission2Script : MonoBehaviour {
 		                                 "Concede, gain 1000g", "Attack")) { // yes, no
 			localPlayer.Gold += 1000;
 			icegardChoice = CONCEDE;
+			tutorialPhase = 7;
 			gameOver("You defeated the castellan forces! The castle is yours.", true);
 		}else{
 			icegardChoice = ATTACK;

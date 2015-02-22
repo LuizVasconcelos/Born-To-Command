@@ -342,9 +342,11 @@ public class Mission1Script : MonoBehaviour {
 				}
 				break;
 
-			/*case 7:
-				Application.LoadLevel("mainScene");
-				break;*/
+			case 7:
+				if(weWin){
+					Application.LoadLevel("mainScene");
+				}
+				break;
 			}
 		}
 

@@ -25,6 +25,7 @@ public class Mission1Script : MonoBehaviour {
 
 	// aux boolean
 	private bool canContinue;
+	private bool weWin;
 
 	// Players variables
 	private Player localPlayer;
@@ -119,6 +120,7 @@ public class Mission1Script : MonoBehaviour {
 
 		// aux boolean
 		canContinue = false;
+		weWin = false;
 	}
 	
 	// Update is called once per frame
@@ -304,6 +306,10 @@ public class Mission1Script : MonoBehaviour {
 				break;
 
 			case 6:
+				if(!weWin) {
+					tutorialPhase++;
+					return;
+				}
 				if(charOnPos && scrollOnPos) {
 					tutorialText = GameObject.Find ("tutorialText6");
 					Vector3 labelPosition = tutorialText.transform.position;
@@ -532,10 +538,12 @@ public class Mission1Script : MonoBehaviour {
 		} else {
 			title = "You lose!";
 			ok = "Try again";
-		}
-		singleButton = true;
+
+			singleButton = true;
 		dialogPos = "finalMessage";
 		dialog.showSingleDialogMessage(title, msg, ok);
+		}
+		
 		/*if (EditorUtility.DisplayDialog (title, //title
 		                                 msg, // text
 		                                 ok)) { // yes, no
@@ -543,6 +551,7 @@ public class Mission1Script : MonoBehaviour {
 		}*/
 		tutorialOn = true;
 		canContinue = false;
+		weWin = win;
 		tutorialPhase++;
 	}
 

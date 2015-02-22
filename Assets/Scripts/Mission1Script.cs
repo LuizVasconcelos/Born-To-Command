@@ -342,9 +342,9 @@ public class Mission1Script : MonoBehaviour {
 				}
 				break;
 
-			case 7:
+			/*case 7:
 				Application.LoadLevel("mainScene");
-				break;
+				break;*/
 			}
 		}
 
@@ -530,6 +530,10 @@ public class Mission1Script : MonoBehaviour {
 	void gameOver(string msg, bool win){
 		string title = "";
 		string ok = "";
+		tutorialOn = true;
+		canContinue = false;
+		weWin = win;
+		tutorialPhase++;
 
 		if (win) {
 			title = "You win!";
@@ -538,21 +542,13 @@ public class Mission1Script : MonoBehaviour {
 		} else {
 			title = "You lose!";
 			ok = "Try again";
-
-			singleButton = true;
-		dialogPos = "finalMessage";
-		dialog.showSingleDialogMessage(title, msg, ok);
-		}
 		
-		/*if (EditorUtility.DisplayDialog (title, //title
-		                                 msg, // text
-		                                 ok)) { // yes, no
-			//Application.LoadLevel ("mainScene");
-		}*/
-		tutorialOn = true;
-		canContinue = false;
-		weWin = win;
-		tutorialPhase++;
+			singleButton = true;
+			dialogPos = "finalMessage";
+			dialog.showSingleDialogMessage(title, msg, ok);
+		}
+
+
 	}
 
 	void starving(){
@@ -728,7 +724,8 @@ public class Mission1Script : MonoBehaviour {
 			if(dialogPos == "notRouteMessage"){
 				dialog.hideDialog ();
 			}else if(dialogPos == "finalMessage"){
-				dialog.hideDialog ();
+				Application.LoadLevel("mainScene");
+				//dialog.hideDialog ();
 			}
 		}else{
 			if(dialogPos == "startMessage"){

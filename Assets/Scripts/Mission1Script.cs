@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 #if UNITY_EDITOR
@@ -62,8 +62,16 @@ public class Mission1Script : MonoBehaviour {
 	private int villageChoice;
 	private int castleChoice;
 
+	// Dialog
+	private DialogUtils dialog;
+	private bool singleButton;
+	private string dialogPos;
+
 	// Use this for initialization
 	void Start () {
+		dialog = new DialogUtils();
+		dialog.hideDialog();
+
 		GameObject.Find("ParticleSystem").particleSystem.Stop();
 		village3Clicked = false;
 		castleClicked = false;
@@ -525,11 +533,14 @@ public class Mission1Script : MonoBehaviour {
 			title = "You lose!";
 			ok = "Try again";
 		}
-		if (EditorUtility.DisplayDialog (title, //title
+		singleButton = true;
+		dialogPos = "finalMessage";
+		dialog.showSingleDialogMessage(title, msg, ok);
+		/*if (EditorUtility.DisplayDialog (title, //title
 		                                 msg, // text
 		                                 ok)) { // yes, no
 			//Application.LoadLevel ("mainScene");
-		}
+		}*/
 		tutorialOn = true;
 		canContinue = false;
 		tutorialPhase++;
@@ -672,27 +683,77 @@ public class Mission1Script : MonoBehaviour {
 
 	void OnGoClicked(){
 		if (!castleClicked) {
-			if (EditorUtility.DisplayDialog ("No route selected!", //title
+			singleButton = true;
+			dialogPos = "notRouteMessage";
+			dialog.showSingleDialogMessage("No route selected!",
+			                               "You must select a route to siege the castle.\n" +
+			                               "You can either go through the forest village ou direct to the castle",
+			                               "OK");
+			singleButton = true;
+			/*if (EditorUtility.DisplayDialog ("No route selected!", //title
 			                                 "You must select a route to siege the castle.\n" +
 			                                 "You can either go through the forest village ou direct to the castle", // text
 			                                 "OK")) { // yes, no
 				//isGoClicked = true;
-			}
+			}*/
 		} else {
 			string info = "";
 			if(village3Clicked) info = "Hint: The forest folk might be dangerous.";
 			else info = "Hint: Going directly might exhaust your resources on the journey.";
-			if (EditorUtility.DisplayDialog ("March to Battle!", //title
-			                                 "Are you sure you want to follow this route to battle?\n"+info, // text
-			                                 "Yes", "No")) { // yes, no
+			singleButton = false;
+			dialogPos = "startMessage";
+			dialog.showDialogMessage("March to Battle!",
+			                         "Are you sure you want to follow this route to battle?\n"+info,
+			                         "Yes", "No");
+			/*if (EditorUtility.DisplayDialog ("March to Battle!", //title
+		                                 "Are you sure you want to follow this route to battle?\n"+info, // text
+		                                 "Yes", "No")) { // yes, no*/
+
+			//}
+		}
+	}
+
+	public void onClickButton1(){
+		if(singleButton){
+			Debug.Log ("Dialog button 1");
+			if(dialogPos == "notRouteMessage"){
+				dialog.hideDialog ();
+			}else if(dialogPos == "finalMessage"){
+				dialog.hideDialog ();
+			}
+		}else{
+			if(dialogPos == "startMessage"){
+
 				isGoClicked = true;
 				GameObject btnGo = GameObject.Find ("btnGo");
 				GameObject btnCancel = GameObject.Find ("btnCancel");
-
+				
 				btnGo.SetActive(false);
 				btnCancel.SetActive(false);
+
+			}else if(dialogPos == "villageMessage"){
+				villageChoice = ATTACK_VILLAGE;
+				dialogPos = "";
+			}else if(dialogPos == "castleMessage"){
+				castleChoice = ATTACK_CASTLE;
+				dialogPos = "";
 			}
+			dialog.hideDialog ();
 		}
+	}
+	
+	public void onClickButton2(){
+		Debug.Log ("Dialog button 2");
+		if(dialogPos == "startMessage"){
+			// Do nothing
+		}else if(dialogPos == "villageMessage"){
+			villageChoice = PAY_VILLAGE;
+			dialogPos = "";
+		}else if(dialogPos == "castleMessage"){
+			castleChoice = DUEL_CASTLE;
+			dialogPos = "";
+		}
+		dialog.hideDialog();
 	}
 
 	void onCancelClicked(){
@@ -742,7 +803,13 @@ public class Mission1Script : MonoBehaviour {
 
 	/***************************** Village Script ***************************/
 	void villageEvent(){
-		if (EditorUtility.DisplayDialog ("You arrived at the forest village", //title
+		dialog.showDialogMessage("You arrived at the forest village", //title
+		                         "People from the village are not allied of your reign and seem a bit hostile.\n" +
+		                         "They don't have enough weaponry and a combat would favor your army.\n" +
+		                         "You can either plunder the village or offer them gold for your stay.", // text
+		                         "Attack", "Pay 1000g");
+		dialogPos = "villageMessage";
+		/*if (EditorUtility.DisplayDialog ("You arrived at the forest village", //title
 		                                 "People from the village are not allied of your reign and seem a bit hostile.\n" +
 		                                 "They don't have enough weaponry and a combat would favor your army.\n" +
 		                                 "You can either plunder the village or offer them gold for your stay.", // text
@@ -750,20 +817,26 @@ public class Mission1Script : MonoBehaviour {
 			villageChoice = ATTACK_VILLAGE;
 		}else{
 			villageChoice = PAY_VILLAGE;
-		}
+		}*/
 	}
 	/************************************************************************/
 
 	/***************************** Castle Script ***************************/
 	void castleEvent(){
-		if (EditorUtility.DisplayDialog ("You found the castle!", //title
+		singleButton = false;
+		dialog.showDialogMessage("You found the castle!", //title
+		                             "The castle is very fortified. Attacking directly might cost you many fighters.\n"+
+		                             "Another option is to challange the castellan, your best champion against his.",
+		                         "Direct attack", "Duel");
+		dialogPos = "castleMessage";
+		/*if (EditorUtility.DisplayDialog ("You found the castle!", //title
 		                                 "The castle is very fortified. Attacking directly might cost you many fighters.\n"+
 		                                 "Another option is to challange the castellan, your best champion against his.",
 		                                 "Direct attack", "Duel")) { // yes, no
 			castleChoice = ATTACK_CASTLE;
 		}else{
 			castleChoice = DUEL_CASTLE;
-		}
+		}*/
 	}
 	/************************************************************************/
 

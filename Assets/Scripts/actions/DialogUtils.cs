@@ -61,6 +61,7 @@ public class DialogUtils : MonoBehaviour {
 
 	public void showSingleDialogMessage(string title, string message, string option){
 		singleButton.SetActive(true);
+		button2.SetActive(false);
 		dialogPanel.transform.position = visibleVector;
 		dialogMessage.transform.position = visibleVectorMessage;
 		singleButton.transform.position = visibleVectorSingleButton;

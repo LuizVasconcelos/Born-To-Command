@@ -1115,11 +1115,12 @@ public class Mission2Script : MonoBehaviour {
 		if(singleButton){
 			if(dialogPos == "notRouteMessage"){
 				// Do nothing
+				dialog.hideDialog();
 			}else if(dialogPos == "finalMessage"){
 				tutorialOn = true;
 				canContinue = false;
+				Application.LoadLevel("mainScene");
 			}
-			dialog.hideDialog();
 		}else{
 			if(dialogPos == "startMessage"){
 				isGoClicked = true;
@@ -1128,6 +1129,8 @@ public class Mission2Script : MonoBehaviour {
 				
 				btnGo.SetActive(false);
 				btnCancel.SetActive(false);
+				dialog.hideDialog();
+
 			}else if(dialogPos == "mahajaChoiceMessage"){
 				mahajaChoice = CONCEDE;
 				tutorialPhase = 8;
@@ -1139,12 +1142,10 @@ public class Mission2Script : MonoBehaviour {
 				tutorialPhase = 7;
 				gameOver("You defeated the castellan forces! The castle is yours.", true);
 			}
-			dialog.hideDialog();
 		}
 	}
 
 	void onButton2Clicked(){
-		// TODO
 		if(dialogPos == "startMessage"){
 			// Do nothing
 		}else if(dialogPos == "mahajaChoiceMessage"){

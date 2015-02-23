@@ -135,11 +135,11 @@ public class Unit
 	public Unit(){}
 
 	public int Damage(){
-		return (this.Weapon.Val * Random.Range (this.Attack.First, this.Attack.Second));
+		return (int) (this.Weapon.Val * Random.Range (this.Attack.First, this.Attack.Second));
 	}
 
 	public float Defend(int damage){
-		return (damage * (this.Defense * this.Armor.Val)) - this.Shield;
+		return (damage * (this.Defense * this.Armor.Val)) - this.Shield.Val;
 	}
 
 	public static Unit newSwordman(){

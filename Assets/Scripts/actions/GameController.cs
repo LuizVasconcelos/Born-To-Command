@@ -77,13 +77,13 @@ public class GameController {
 			int idx = Random.Range(0,(defenders.Units.Count-1));
 			
 			Unit defender = defenders.Units[idx];
-			float rawDamage = damage*defender.Armor;
+			float rawDamage = defender.Defend (damage);
 			
 			// Rock-paper-scisors bonuses
 			if(attacker.Type.Equals(Unit.KNIGHT) && defender.Type.Equals(Unit.SWORDMAN)){
 				rawDamage *= 1.3f;
 			}else if(attacker.Type.Equals(Unit.SWORDMAN) && defender.Type.Equals(Unit.ARCHER)){
-				rawDamage *= 1.25f;
+				rawDamage *= 2.1f;
 			}else if(attacker.Type.Equals(Unit.ARCHER) && defender.Type.Equals(Unit.KNIGHT)){
 				rawDamage *= 1.75f;
 			}
@@ -105,32 +105,53 @@ public class GameController {
 
 }
 
+public class Item
+{
+	public Item(float Val){
+		this.Val = Val;
+	}
+
+	public Item(){
+		// Neutral value
+		this.Val = 1.0f;
+	}
+
+	public float Val { get; set; }
+}
+
 public class Unit
 {
 
-	public Unit(string Type, int Health, Tuple<int, int> Attack, float Armor){
+	public Unit(string Type, int Health, Tuple<int, int> Attack, float Defense, Item Weapon, Item Armor, Item Shield){
 		this.Type = Type;
 		this.Health = Health;
 		this.Attack = Attack;
+		this.Defense = Defense;
+		this.Weapon = Weapon;
 		this.Armor = Armor;
+		this.Shield = Shield;
 	}
 
 	public Unit(){}
 
 	public int Damage(){
-		return Random.Range (this.Attack.First, this.Attack.Second);
+		return (int) (this.Weapon.Val * Random.Range (this.Attack.First, this.Attack.Second));
+	}
+
+	public float Defend(int damage){
+		return (damage * (this.Defense * this.Armor.Val)) - this.Shield.Val;
 	}
 
 	public static Unit newSwordman(){
-		return new Unit(Unit.SWORDMAN,100,new Tuple<int, int>(20,35),0.2f);
+		return new Unit(Unit.SWORDMAN,100,new Tuple<int, int>(20,35),0.2f, new Item(), new Item(), new Item());
 	}
 
 	public static Unit newKnight(){
-		return new Unit(Unit.KNIGHT,100,new Tuple<int, int>(25,30),0.35f);
+		return new Unit(Unit.KNIGHT,100,new Tuple<int, int>(25,30),0.35f, new Item(), new Item(), new Item());
 	}
 
 	public static Unit newArcher(){
-		return new Unit(Unit.ARCHER,100,new Tuple<int, int>(10,100),0.05f);
+		return new Unit(Unit.ARCHER,100,new Tuple<int, int>(10,100),0.05f, new Item(), new Item(), new Item());
 	}
 
 	public const string SWORDMAN = "Swordman";
@@ -140,7 +161,12 @@ public class Unit
 	public string Type { get; set; }
 	public int Health { get; set; }
 	public Tuple<int, int> Attack { get; set; }
-	public float Armor { get; set; }
+	public float Defense { get; set; }
+
+	// equipament
+	public Item Weapon { get; set; }
+	public Item Armor { get; set; }
+	public Item Shield { get; set; }
 }
 
 public class Ship
@@ -148,6 +174,8 @@ public class Ship
 	public Ship(int Capacity){
 		this.Capacity = Capacity;
 	}
+
+	public Ship(){}
 
 	public int Capacity { get; set; }
 }
@@ -177,6 +205,7 @@ public class Player
 		this.Moral = Moral;
 		this.Travelling = Travelling;
 		this.Game = Game;
+		this.Items = new Item[]{null, null, null};
 
 	}
 
@@ -244,6 +273,30 @@ public class Player
 
 		return units;
 	}
+
+	public void UpgradeWeapon(Item item){
+		for (int i = 0; i<this.Units.Units.Count; i++) {
+			this.Units.Units[i].Weapon = item;
+		}
+
+		this.Items [0] = item;
+	}
+
+	public void UpgradeArmor(Item item){
+		for (int i = 0; i<this.Units.Units.Count; i++) {
+			this.Units.Units[i].Armor = item;
+		}
+
+		this.Items [1] = item;
+	}
+
+	public void UpgradeShield(Item item){
+		for (int i = 0; i<this.Units.Units.Count; i++) {
+			this.Units.Units[i].Shield = item;
+		}
+
+		this.Items [2] = item;
+	}
 	
 	[XmlElement]
 	public int Gold { get; set; }
@@ -262,6 +315,9 @@ public class Player
 
 	[XmlArray]
 	public int[] Game { get; set; }
+
+	[XmlArray]
+	public Item[] Items { get; set; }
 }
 
 

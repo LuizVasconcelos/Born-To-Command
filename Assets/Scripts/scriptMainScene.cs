@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -61,9 +61,9 @@ public class scriptMainScene : MonoBehaviour {
 			scroll.SetActive (false);
 		}
 
-		bool[] game = new bool[]{false};
+		int[] game = new int[]{Player.ENABLED, Player.DISABLED,Player.DISABLED,Player.DISABLED};
 		if(GameManager.player == null){
-			localPlayer = new Player (1570, 6, Player.generateTroop(150), 0, 0,game);
+			localPlayer = new Player (1570, 6, Player.generateTroop(50,50,50), 0, 0,game);
 			GameManager.player = localPlayer;
 		}
 		localPlayer = GameManager.player;
@@ -71,7 +71,7 @@ public class scriptMainScene : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (localPlayer.Game [0] == true) {
+		if (localPlayer.Game [0] == 1) {
 
 		}
 

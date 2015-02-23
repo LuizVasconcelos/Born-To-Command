@@ -6,7 +6,7 @@ using System.IO;
 
 public class scriptLoadScene : MonoBehaviour {
 	private int numberGame = 0;
-	private Player player = new Player(10,10, new Troop(new List<Unit>()), 10, 10, new bool[]{false});
+	private Player player = new Player(10,10, new Troop(new List<Unit>(), new List<Ship>()), 10, 10, new int[]{Player.ENABLED, Player.DISABLED, Player.DISABLED, Player.DISABLED});
 
 	void Start(){
 		for (int i = 1; i < 5; i++) {

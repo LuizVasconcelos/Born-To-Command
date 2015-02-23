@@ -108,7 +108,7 @@ public class Mission2Script : MonoBehaviour {
 		mahajaChoice = 0;
 		
 		//localPlayer = GameManager.player;
-		bool[] game = new bool[]{false};
+		int[] game = new int[]{Player.ENABLED, Player.DISABLED, Player.DISABLED, Player.DISABLED};
 		localPlayer = new Player (1570, 6, Player.generateTroop(50,50,50), 0, 0,game);
 		playerTroopsMax = localPlayer.Units.Units.Count;
 		icegardTroopsMax = 50;
@@ -898,10 +898,12 @@ public class Mission2Script : MonoBehaviour {
 		if (win) {
 			title = "You win!";
 			ok = "Proceed";
-			localPlayer.Game = new bool[]{true};
+			//localPlayer.Game = new bool[]{true};
+			localPlayer.Game[1] = Player.WON;
 		} else {
 			title = "You lose!";
 			ok = "Try again";
+			localPlayer.Game[1] = Player.LOST;
 		}
 		dialogPos = "finalMessage";
 		singleButton = true;

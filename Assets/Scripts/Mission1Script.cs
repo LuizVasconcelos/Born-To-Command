@@ -540,11 +540,14 @@ public class Mission1Script : MonoBehaviour {
 		if (win) {
 			title = "You win!";
 			ok = "Proceed";
-			localPlayer.Game = new bool[]{true};
+			//localPlayer.Game = new bool[]{true};
+			localPlayer.Game[0] = Player.WON;
 		} else {
 			title = "You lose!";
 			ok = "Try again";
 		
+			localPlayer.Game[0] = Player.LOST;
+
 			singleButton = true;
 			dialogPos = "finalMessage";
 			dialog.showSingleDialogMessage(title, msg, ok);

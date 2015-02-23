@@ -301,10 +301,12 @@ public class Mission3_2Script : MonoBehaviour {
 		if (win) {
 			title = "You win!";
 			ok = "Proceed";
-			localPlayer.Game = new bool[]{true};
+			//localPlayer.Game = new bool[]{true};
+			localPlayer.Game[3] = Player.WON;
 		} else {
 			title = "You lose!";
 			ok = "Try again";
+			localPlayer.Game[3] = Player.LOST;
 		}
 		if (EditorUtility.DisplayDialog (title, //title
 		                                 msg, // text

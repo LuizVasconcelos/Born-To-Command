@@ -143,35 +143,52 @@ public class Unit
 	public float Armor { get; set; }
 }
 
+public class Ship
+{
+	public Ship(int Capacity){
+		this.Capacity = Capacity;
+	}
+
+	public int Capacity { get; set; }
+}
+
 public class Troop
 {
-	public Troop (List<Unit> Units, int Deaths = 0){
+	public Troop (List<Unit> Units, List<Ship> Ships, int Deaths = 0){
 		this.Units = Units;
+		this.Ships = Ships;
 		this.Deaths = Deaths;
 	}
 
 	public Troop(){}
 
 	public List<Unit> Units { get; set; }
+	public List<Ship> Ships { get; set; }
 	public int Deaths { get; set; }
 }
 
 [XmlRoot]
 public class Player
 {
-	public Player (int Gold, int Food, Troop Units, int Moral, int Travelling, bool[] Game){
+	public Player (int Gold, int Food, Troop Units, int Moral, int Travelling, int[] Game){
 		this.Gold = Gold;
 		this.Food = Food;
 		this.Units = Units;
 		this.Moral = Moral;
 		this.Travelling = Travelling;
 		this.Game = Game;
+
 	}
 
 	public Player(){}
 
+	public const int DISABLED = 0;
+	public const int ENABLED = 1;
+	public const int WON = 2;
+	public const int LOST = 3;
+
 	public static Troop generateTroop(int size){
-		Troop units = new Troop (new List<Unit>(size));
+		Troop units = new Troop (new List<Unit>(size), new List<Ship>());
 		for (int i = 0; i<size; i++) {
 			int type = Random.Range(1,3);
 			Unit u = null;
@@ -197,7 +214,7 @@ public class Player
 	}
 
 	public static Troop generateTroop(int swordmans, int knights, int archers){
-		Troop units = new Troop (new List<Unit> (swordmans + knights + archers));
+		Troop units = new Troop (new List<Unit> (swordmans + knights + archers), new List<Ship>());
 		for (int i = 0; i<swordmans; i++) {
 				Unit u = Unit.newSwordman ();
 				/*Debug.Log("Unit:: \n" +
@@ -244,7 +261,7 @@ public class Player
 	public int Travelling { get; set; }
 
 	[XmlArray]
-	public bool[] Game { get; set; }
+	public int[] Game { get; set; }
 }
 
 
@@ -263,6 +280,9 @@ public class Tuple<T1, T2>
 {
 	public T1 First { get; private set; }
 	public T2 Second { get; private set; }
+
+	public Tuple(){}
+
 	internal Tuple(T1 first, T2 second)
 	{
 		First = first;

@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class scriptCarpenterScene : MonoBehaviour {
 
@@ -15,16 +15,23 @@ public class scriptCarpenterScene : MonoBehaviour {
 	private GameObject shipOne;
 	private GameObject shipTwo;
 	private GameObject shipThree;
-	
-	private bool isBtnUpgradeClicked;
+
 	private bool isBtnConstruirClicked;
 	
 	private GameObject information;
 	private GameObject shipInformation;
-	private GameObject btnUpgrade;
 	private GameObject btnConstruir;
 	
 	private Player localPlayer;
+
+	private List<Ship> Ships; 
+
+	private Ship shipToBuy;
+
+	private bool isBtnVoltarClicked;
+	private GameObject btnVoltar;
+
+	private int custo;
 
 	// Use this for initialization
 	void Start () 
@@ -40,22 +47,38 @@ public class scriptCarpenterScene : MonoBehaviour {
 		shipOne = GameObject.Find ("btnShip1");
 		shipTwo = GameObject.Find ("btnShip2");
 		shipThree = GameObject.Find ("btnShip3");
-		
-		isBtnUpgradeClicked = false;
+
 		isBtnConstruirClicked = false;
 		
 		information = GameObject.Find ("SelectedShipInformation");
 		shipInformation = GameObject.Find ("shipInformation");
-		btnUpgrade = GameObject.Find ("btnUpgrade");
 		btnConstruir = GameObject.Find ("btnConstruir");
 		
 		information.SetActive (false);
 		shipInformation.SetActive (false);
-		btnUpgrade.SetActive (false);
 		btnConstruir.SetActive (false);
 
 		localPlayer = GameManager.player;
+
+		inicializeShipsList ();
+
+		shipToBuy = null;
+
+		isBtnVoltarClicked = false;
+		btnVoltar = GameObject.Find ("btnReturn");
+
+		custo = 0;
 	}
+
+
+	void inicializeShipsList() {
+		Ships = new List<Ship> ();
+
+		Ships.Add(new Ship(10));
+		Ships.Add(new Ship(50));
+		Ships.Add(new Ship(100));
+	}
+
 	
 	// Update is called once per frame
 	void Update () 
@@ -71,30 +94,28 @@ public class scriptCarpenterScene : MonoBehaviour {
 			
 		}else if(isBtnShipOneClicked) {
 			//passar os status do tipo de soldado selecionado
-			updateSelectedShipInformation(1);
+			updateSelectedShipInformation(GetSelectedShip(1), shipsTypeQuantity(1));
 			
 			if(!information.activeInHierarchy) {
 				//inserir as informaçoes na telinha
 				
 				information.SetActive (true);
 				shipInformation.SetActive (true);
-				btnUpgrade.SetActive (true);
 				btnConstruir.SetActive (true);
 			}else {
 				//atualizar as informaçoes na telinha
 			}
-			
+
 			isBtnShipOneClicked = false;
 		}else if(isBtnShipTwoClicked) {
 			//passar os status do tipo de soldado selecionado
-			updateSelectedShipInformation(2);
+			updateSelectedShipInformation(GetSelectedShip(2), shipsTypeQuantity(2));
 			
 			if(!information.activeInHierarchy) {
 				//inserir as informaçoes na telinha
 				
 				information.SetActive (true);
 				shipInformation.SetActive (true);
-				btnUpgrade.SetActive (true);
 				btnConstruir.SetActive (true);
 			}else {
 				//atualizar as informaçoes na telinha
@@ -103,49 +124,94 @@ public class scriptCarpenterScene : MonoBehaviour {
 			isBtnShipTwoClicked = false;
 		}else if(isBtnShipThreeClicked) {
 			//passar os status do tipo de soldado selecionado
-			updateSelectedShipInformation(3);
+			updateSelectedShipInformation(GetSelectedShip(3), shipsTypeQuantity(3));
 			
 			if(!information.activeInHierarchy) {
 				//inserir as informaçoes na telinha
 				
 				information.SetActive (true);
 				shipInformation.SetActive (true);
-				btnUpgrade.SetActive (true);
 				btnConstruir.SetActive (true);
 			}else {
 				//atualizar as informaçoes na telinha
 			}
 			
 			isBtnShipThreeClicked = false;
-		}else if(isBtnUpgradeClicked) {
-			//realizar upgrade do barco selecionado
-			
-			information.SetActive(false);
-			shipInformation.SetActive(false);
-			btnUpgrade.SetActive(false);
-			btnConstruir.SetActive(false);
-			
-			isBtnUpgradeClicked = false;
 		}else if(isBtnConstruirClicked) {
 			//realizar compra do barco selecionado
-			
-			information.SetActive(false);
-			shipInformation.SetActive(false);
-			btnUpgrade.SetActive(false);
-			btnConstruir.SetActive(false);
+			if(localPlayer.Gold >= custo) {
+				localPlayer.Units.Ships.Add(shipToBuy);
+
+				localPlayer.Gold -= custo;
+
+				information.SetActive(false);
+				shipInformation.SetActive(false);
+				btnConstruir.SetActive(false);
+			}
 			
 			isBtnConstruirClicked = false;
+		}else if(isBtnVoltarClicked) {
+			isBtnVoltarClicked = false;
+
+			GameManager.player = localPlayer;
+			Application.LoadLevel("mainScene");
 		}
 	}
 
 
-	void updateSelectedShipInformation(int type) {
-		UILabel content = shipInformation.GetComponent<UILabel> ();
-		
-		/*content.text = selected.GetTypeWeapon() + "\n\n" +
-			"Price: " + selected.GetPriceOfPurchase() + "\n" +
-				"Payload: " + selected.GetPriceOfSelling() + "\n";*/
+	Ship GetSelectedShip(int position) {
+		return Ships[position-1];
 	}
+
+	int shipsTypeQuantity(int type) {
+		int qtt = 0;
+
+		if (type == 1) {
+			foreach(Ship s in localPlayer.Units.Ships) {
+				if(s.Capacity == 10) {
+					qtt++;
+				}
+			}
+
+			custo = 75;
+		}else if (type == 2) {
+			foreach(Ship s in localPlayer.Units.Ships) {
+				if(s.Capacity == 50) {
+					qtt++;
+				}
+			}
+
+			custo = 125;
+		}else if (type == 3) {
+			foreach(Ship s in localPlayer.Units.Ships) {
+				if(s.Capacity == 100) {
+					qtt++;
+				}
+			}
+
+			custo = 225;
+		}
+
+		return qtt;
+	}
+
+
+	void updateSelectedShipInformation(Ship selected, int sameShipTypeQuantity) {
+		UILabel content = shipInformation.GetComponent<UILabel> ();
+
+		if (sameShipTypeQuantity == 1) {
+			content.text = "Owned: " + sameShipTypeQuantity + " ship\n" +
+				"Capacity: " + selected.Capacity + " soldiers\n" + 
+					"Price: " + custo + " gold\n";
+		}else {
+			content.text = "Owned: " + sameShipTypeQuantity + " ships\n" +
+				"Capacity: " + selected.Capacity + " soldiers\n" +
+					"Price: " + custo + " gold\n";
+		}
+
+		shipToBuy = selected;
+	}
+
 
 
 	void onShipOneClicked()
@@ -162,14 +228,14 @@ public class scriptCarpenterScene : MonoBehaviour {
 	{
 		isBtnShipThreeClicked = true;
 	}
-	
-	void onBtnUpgradeClicked()
-	{
-		isBtnUpgradeClicked = true;
-	}
 
 	void onBtnConstruirClicked()
 	{
 		isBtnConstruirClicked = true;
+	}
+
+	void onBtnVoltarClicked()
+	{
+		isBtnVoltarClicked = true;
 	}
 }

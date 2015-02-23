@@ -47,9 +47,15 @@ public class Mission3_1Script : MonoBehaviour {
 	// Actions
 	private int villageChoice;
 	private int castleChoice;
+
+	// Dialog 
+	DialogUtils dialog;
+
 	
 	// Use this for initialization
 	void Start () {
+		dialog = new DialogUtils();
+
 		oasisClicked = false;	
 		mountainsClicked = false;	
 		seaClicked = false;	

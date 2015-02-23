@@ -1119,7 +1119,7 @@ public class Mission2Script : MonoBehaviour {
 			}else if(dialogPos == "finalMessage"){
 				tutorialOn = true;
 				canContinue = false;
-				Application.LoadLevel("mainScene");
+				//Application.LoadLevel("mainScene");
 			}
 		}else{
 			if(dialogPos == "startMessage"){

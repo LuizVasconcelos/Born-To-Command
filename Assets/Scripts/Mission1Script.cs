@@ -815,8 +815,8 @@ public class Mission1Script : MonoBehaviour {
 	/***************************** Village Script ***************************/
 	void villageEvent(){
 		dialog.showDialogMessage("You arrived at the forest village", //title
-		                         "People from the village are not allied of your reign and seem a bit hostile.\n" +
-		                         "They don't have enough weaponry and a combat would favor your army.\n" +
+		                         "People from the village are not allied of your reign and \nseem a bit hostile.\n" +
+		                         "They don't have enough weaponry and a combat would \nfavor your army.\n" +
 		                         "You can either plunder the village or offer them gold for your stay.", // text
 		                         "Attack", "Pay 1000g");
 		dialogPos = "villageMessage";
@@ -836,8 +836,8 @@ public class Mission1Script : MonoBehaviour {
 	void castleEvent(){
 		singleButton = false;
 		dialog.showDialogMessage("You found the castle!", //title
-		                             "The castle is very fortified. Attacking directly might cost you many fighters.\n"+
-		                             "Another option is to challange the castellan, your best champion against his.",
+		                             "The castle is very fortified. \nAttacking directly might cost you many fighters.\n"+
+		                             "Another option is to challange the castellan, \nyour best champion against his.",
 		                         "Direct attack", "Duel");
 		dialogPos = "castleMessage";
 		/*if (EditorUtility.DisplayDialog ("You found the castle!", //title

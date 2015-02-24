@@ -14,10 +14,13 @@ public class scriptMainScene : MonoBehaviour {
 	private bool isMissionsClicked;
 	private bool isSaveGameClicked;
 
+	private AudioSource auSong;
+
 	// mission 1 objs
 	private bool isTarget1Clicked;
 	private GameObject btnTarget1;
 	private GameObject panel;
+	private GameObject music;
 
 	private GameObject btnMissions;
 	private Vector3 currentRotation;
@@ -56,6 +59,14 @@ public class scriptMainScene : MonoBehaviour {
 		btnTarget1 = GameObject.Find ("btnTarget1");
 
 		panel = GameObject.Find ("Panel");
+		music = GameObject.Find ("Camera");
+		auSong = (AudioSource)music.AddComponent ("AudioSource");
+		AudioClip mainSong;
+		mainSong = (AudioClip)Resources.Load ("Main Song");
+		auSong.clip = mainSong;
+		auSong.loop = true;
+
+		auSong.Play ();
 
 		if (scroll != null) {
 			scroll.SetActive (false);
@@ -273,6 +284,10 @@ public class scriptMainScene : MonoBehaviour {
 		                            "OK", "Cancel")) { // yes, no
 						isTarget1Clicked = true;
 				}
+	}
+
+	void awake(){
+		DontDestroyOnLoad (music);
 	}
 }
 #endif

@@ -24,6 +24,7 @@ public class scriptBlacksmithScene : MonoBehaviour {
 	private GameObject itemOne;
 	private GameObject itemTwo;
 	private GameObject itemThree;
+	private GameObject music;
 
 	private bool isBtnCompraClicked;
 
@@ -74,6 +75,7 @@ public class scriptBlacksmithScene : MonoBehaviour {
 		itemOne = GameObject.Find ("btnItem1");
 		itemTwo = GameObject.Find ("btnItem2");
 		itemThree = GameObject.Find ("btnItem3");
+		music = GameObject.Find ("Camera");
 
 		itemOne.SetActive (false);
 		itemTwo.SetActive (false);
@@ -90,6 +92,7 @@ public class scriptBlacksmithScene : MonoBehaviour {
 		btnComprar.SetActive (false);
 
 		localPlayer = GameManager.player;
+		DontDestroyOnLoad (music);
 
 		inicializeEquipmentsList ();
 

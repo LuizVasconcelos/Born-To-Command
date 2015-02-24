@@ -74,8 +74,8 @@ public class Mission1Script : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		dialog = new DialogUtils();
-		dialog.hideDialog();
+		//dialog = new DialogUtils();
+		//dialog.hideDialog();
 
 		GameObject.Find("ParticleSystem").particleSystem.Stop();
 		village3Clicked = false;
@@ -88,6 +88,7 @@ public class Mission1Script : MonoBehaviour {
 
 
 		localPlayer = GameManager.player;
+		//Debug.Log (localPlayer != null);
 		playerTroopsMax = localPlayer.Units.Units.Count;
 		villageTroopsMax = 40;
 		castleTroopsMax = 70;

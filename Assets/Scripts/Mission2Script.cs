@@ -218,6 +218,7 @@ public class Mission2Script : MonoBehaviour {
 					Vector3 newLabelPosition = new Vector3(labelPosition.x, labelPosition.y, -1);
 					//Debug.Log ("dsadsa");
 					tutorialText.transform.position = newLabelPosition;
+					canContinue = true;
 					
 					if(Input.GetKeyDown(KeyCode.Return)) tutorialPhase++;
 				} else {
@@ -1053,7 +1054,7 @@ public class Mission2Script : MonoBehaviour {
 				
 				localtarget = new Vector3(nextLabel.transform.position.x,
 				                          nextLabel.transform.position.y,
-				                          nextLabel.transform.position.y-1f);
+				                          nextLabel.transform.position.z);
 				halt = false;
 			}else{
 				stopped = true;

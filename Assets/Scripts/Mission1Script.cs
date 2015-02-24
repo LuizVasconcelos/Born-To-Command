@@ -697,7 +697,7 @@ public class Mission1Script : MonoBehaviour {
 			dialogPos = "notRouteMessage";
 			dialog.showSingleDialogMessage("No route selected!",
 			                               "You must select a route to siege the castle.\n" +
-			                               "You can either go through the forest village ou direct to the castle",
+			                               "You can either go through the forest village \nou direct to the castle",
 			                               "OK");
 			singleButton = true;
 			/*if (EditorUtility.DisplayDialog ("No route selected!", //title

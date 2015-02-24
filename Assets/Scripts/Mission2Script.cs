@@ -905,8 +905,6 @@ public class Mission2Script : MonoBehaviour {
 			ok = "Try again";
 			localPlayer.Game[1] = Player.LOST;
 		}
-		dialogPos = "finalMessage";
-		singleButton = true;
 		//dialog.showSingleDialogMessage(title, msg, ok);
 		/*
 		if (EditorUtility.DisplayDialog (title, //title
@@ -916,8 +914,14 @@ public class Mission2Script : MonoBehaviour {
 			tutorialOn = true;
 			canContinue = false;
 		}*/
-		tutorialOn = true;
+		if(localPlayer.Game[1] == Player.LOST){
+			dialogPos = "finalMessage";
+			singleButton = true;
+			dialog.showSingleDialogMessage(title, msg, ok);
+		}else{
+			tutorialOn = true;
 			canContinue = false;
+		}
 	}
 	
 	void starving(){
@@ -1121,9 +1125,9 @@ public class Mission2Script : MonoBehaviour {
 				// Do nothing
 				dialog.hideDialog();
 			}else if(dialogPos == "finalMessage"){
-				tutorialOn = true;
-				canContinue = false;
-				//Application.LoadLevel("mainScene");
+				//tutorialOn = true;
+				//canContinue = false;
+				Application.LoadLevel("mainScene");
 			}
 		}else{
 			if(dialogPos == "startMessage"){

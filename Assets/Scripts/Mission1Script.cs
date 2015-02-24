@@ -18,10 +18,14 @@ public class Mission1Script : MonoBehaviour {
 	private bool scrollOnPos2;
 	private int tutorialPhase;
 	private GameObject tutorialText;
+	private GameObject music;
 	private Vector3 originalCharPosition1;
 	private Vector3 originalCharPosition2;
 	private Vector3 originalScrollPosition1;
 	private Vector3 originalScrollPosition2;
+
+	private AudioSource auV;
+	private AudioSource auD;
 
 	// aux boolean
 	private bool canContinue;
@@ -77,11 +81,11 @@ public class Mission1Script : MonoBehaviour {
 		village3Clicked = false;
 		castleClicked = false;
 		startTime = Time.time;
-
 		isGoClicked = false;
 		step2 = false;
 		villageChoice = 0;
 		castleChoice = 0;
+
 
 		localPlayer = GameManager.player;
 		playerTroopsMax = localPlayer.Units.Units.Count;
@@ -92,6 +96,17 @@ public class Mission1Script : MonoBehaviour {
 
 		target = GameObject.Find ("Personagem").transform.position;
 		halt = true;
+
+		auV = (AudioSource)gameObject.AddComponent ("AudioSource");
+		AudioClip victory;
+		victory = (AudioClip)Resources.Load ("Vitoria Batalha");
+		auV.clip = victory;
+
+		auD = (AudioSource)gameObject.AddComponent ("AudioSource");
+		AudioClip lost;
+		lost = (AudioClip)Resources.Load ("Derrota");
+		auD.clip = lost;
+		
 
 		labelsCrossed = 0;
 
@@ -471,7 +486,7 @@ public class Mission1Script : MonoBehaviour {
 
 				}else if(villageTroops.Units.Count == 0){
 					// Win :)	
-
+					auV.Play();
 					isGoClicked = true;
 					localPlayer.Food += 6;
 					localPlayer.Gold += 500;
@@ -540,12 +555,13 @@ public class Mission1Script : MonoBehaviour {
 		if (win) {
 			title = "You win!";
 			ok = "Proceed";
+			auV.Play();
 			//localPlayer.Game = new bool[]{true};
 			localPlayer.Game[0] = Player.WON;
 		} else {
 			title = "You lose!";
 			ok = "Try again";
-		
+			auD.Play();
 			localPlayer.Game[0] = Player.LOST;
 
 			singleButton = true;

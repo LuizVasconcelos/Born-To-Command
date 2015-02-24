@@ -87,9 +87,7 @@ public class scriptMedicalCenterScene : MonoBehaviour {
 
 				information.SetActive (true);
 				unitysSelectedTypeStatus.SetActive (true);
-				btnCurar.SetActive (true);
-			}else {
-				//atualizar as informaçoes na telinha
+				//btnCurar.SetActive (true);
 			}
 
 			soldierType = 1;
@@ -103,9 +101,7 @@ public class scriptMedicalCenterScene : MonoBehaviour {
 				
 				information.SetActive (true);
 				unitysSelectedTypeStatus.SetActive (true);
-				btnCurar.SetActive (true);
-			}else {
-				//atualizar as informaçoes na telinha
+				//btnCurar.SetActive (true);
 			}
 
 			soldierType = 2;
@@ -119,9 +115,7 @@ public class scriptMedicalCenterScene : MonoBehaviour {
 				
 				information.SetActive (true);
 				unitysSelectedTypeStatus.SetActive (true);
-				btnCurar.SetActive (true);
-			}else {
-				//atualizar as informaçoes na telinha
+				//btnCurar.SetActive (true);
 			}
 
 			soldierType = 3;
@@ -199,16 +193,26 @@ public class scriptMedicalCenterScene : MonoBehaviour {
 		if(type.Equals("Knight")) custo = feridos*10;
 		else custo = feridos*3;
 
-		if (feridos == 1) {
+		if (feridos == 0) {
+			content.text = type + "\n\n" +
+				"There aren't \nwounded soldiers!\n";
+
+			btnCurar.SetActive(false);
+		}else if (feridos == 1) {
 			content.text = type + "\n\n" +
 				"Wounded quantity: " + feridos + " soldier\n" +
 					"Price: " + custo + " gold\n";
+
+			btnCurar.SetActive(true);
 		} else {
 			content.text = type + "\n\n" +
 				"Wounded quantity: " + feridos + " soldiers\n" +
 					"Price: " + custo + " gold\n";
+
+			btnCurar.SetActive(true);
 		}
 	}
+
 
 
 	void onKnightsClicked()

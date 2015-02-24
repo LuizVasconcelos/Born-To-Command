@@ -447,52 +447,71 @@ public class scriptBlacksmithScene : MonoBehaviour {
 
 		Equipment selected = generic as Equipment;
 
-		if ((EQUIPMENT_ID != 2) && (EQUIPMENT_ID != 3)) {
-		
+		bool temp = false;
+
+		if (EQUIPMENT_ID == 2 || EQUIPMENT_ID == 3) {
 			if((localPlayer.Items[1].Val == selected.GetDefense()) || (localPlayer.Items[2].Val == selected.GetDefense())) {
-				content.text = selected.GetTypeEquipment() + "s\n\n" +
-					"Attack: " + selected.GetAttack() + " rate\n" +
-						//"Defense: " + selected.GetDefense() + "\n" +
-						"Price: " + selected.GetPriceOfPurchase() + " gold\n\n\n" + 
-						"Owned!";
-
-				if(btnComprar.activeInHierarchy) {
-					btnComprar.SetActive(false);
-				}
-			}else {
-				content.text = selected.GetTypeEquipment() + "s\n\n" +
-					"Attack: " + selected.GetAttack() + " rate\n" +
-						//"Defense: " + selected.GetDefense() + "\n" +
-						"Price: " + selected.GetPriceOfPurchase() + " gold\n";
-
-				if(!btnComprar.activeInHierarchy) {
-					btnComprar.SetActive(true);
-				}
+				temp = true;
 			}
-		}else {
-
-			if((localPlayer.Items[1].Val == selected.GetDefense()) || (localPlayer.Items[2].Val == selected.GetDefense())) {
-				content.text = selected.GetTypeEquipment() + "s\n\n" +
-					//"Attack: " + selected.GetAttack() + "\n" +
-					"Defense: " + selected.GetDefense() + " rate\n" +
-						"Price: " + selected.GetPriceOfPurchase() + " gold\n\n\n" + 
-						"Owned!";
-
-				if(btnComprar.activeInHierarchy) {
-					btnComprar.SetActive(false);
-				}
-			}else {
-				content.text = selected.GetTypeEquipment() + "s\n\n" +
-					//"Attack: " + selected.GetAttack() + "\n" +
-					"Defense: " + selected.GetDefense() + " rate\n" +
-						"Price: " + selected.GetPriceOfPurchase() + " gold\n";
-
-				if(!btnComprar.activeInHierarchy) {
-					btnComprar.SetActive(true);
-				}
+		} else {
+			if(localPlayer.Items[0].Val == selected.GetAttack()) {
+				temp = true;
 			}
 		}
 
+		if ((localPlayer.Gold < selected.GetPriceOfPurchase()) && (!temp)) {
+			content.text = selected.GetTypeEquipment() + "s\n\n" +
+				"Insufficient gold!";
+
+			btnComprar.SetActive(false);
+		} else {
+			if ((EQUIPMENT_ID != 2) && (EQUIPMENT_ID != 3)) {
+				
+				if(localPlayer.Items[0].Val == selected.GetAttack()) {
+					content.text = selected.GetTypeEquipment() + "s\n\n" +
+						"Attack: " + selected.GetAttack() + " rate\n" +
+							//"Defense: " + selected.GetDefense() + "\n" +
+							"Price: " + selected.GetPriceOfPurchase() + " gold\n\n\n" + 
+							"Owned!";
+					
+					if(btnComprar.activeInHierarchy) {
+						btnComprar.SetActive(false);
+					}
+				}else {
+					content.text = selected.GetTypeEquipment() + "s\n\n" +
+						"Attack: " + selected.GetAttack() + " rate\n" +
+							//"Defense: " + selected.GetDefense() + "\n" +
+							"Price: " + selected.GetPriceOfPurchase() + " gold\n";
+					
+					if(!btnComprar.activeInHierarchy) {
+						btnComprar.SetActive(true);
+					}
+				}
+			}else {
+				
+				if((localPlayer.Items[1].Val == selected.GetDefense()) || (localPlayer.Items[2].Val == selected.GetDefense())) {
+					content.text = selected.GetTypeEquipment() + "s\n\n" +
+						//"Attack: " + selected.GetAttack() + "\n" +
+						"Defense: " + selected.GetDefense() + " rate\n" +
+							"Price: " + selected.GetPriceOfPurchase() + " gold\n\n\n" + 
+							"Owned!";
+					
+					if(btnComprar.activeInHierarchy) {
+						btnComprar.SetActive(false);
+					}
+				}else {
+					content.text = selected.GetTypeEquipment() + "s\n\n" +
+						//"Attack: " + selected.GetAttack() + "\n" +
+						"Defense: " + selected.GetDefense() + " rate\n" +
+							"Price: " + selected.GetPriceOfPurchase() + " gold\n";
+					
+					if(!btnComprar.activeInHierarchy) {
+						btnComprar.SetActive(true);
+					}
+				}
+			}
+		}
+		
 		itemToBuy = selected;
 	}
 

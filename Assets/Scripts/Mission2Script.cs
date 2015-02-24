@@ -907,7 +907,7 @@ public class Mission2Script : MonoBehaviour {
 		}
 		dialogPos = "finalMessage";
 		singleButton = true;
-		dialog.showSingleDialogMessage(title, msg, ok);
+		//dialog.showSingleDialogMessage(title, msg, ok);
 		/*
 		if (EditorUtility.DisplayDialog (title, //title
 		                                 msg, // text
@@ -916,6 +916,8 @@ public class Mission2Script : MonoBehaviour {
 			tutorialOn = true;
 			canContinue = false;
 		}*/
+		tutorialOn = true;
+			canContinue = false;
 	}
 	
 	void starving(){
@@ -1121,7 +1123,7 @@ public class Mission2Script : MonoBehaviour {
 			}else if(dialogPos == "finalMessage"){
 				tutorialOn = true;
 				canContinue = false;
-				Application.LoadLevel("mainScene");
+				//Application.LoadLevel("mainScene");
 			}
 		}else{
 			if(dialogPos == "startMessage"){
@@ -1136,12 +1138,14 @@ public class Mission2Script : MonoBehaviour {
 			}else if(dialogPos == "mahajaChoiceMessage"){
 				mahajaChoice = CONCEDE;
 				tutorialPhase = 8;
+				dialog.hideDialog();
 				gameOver("You defeated the castellan forces! The castle is yours.", true);
 		
 			}else if(dialogPos == "icegardChoiceMessage"){
 				localPlayer.Gold += 1000;
 				icegardChoice = CONCEDE;
 				tutorialPhase = 7;
+				dialog.hideDialog();
 				gameOver("You defeated the castellan forces! The castle is yours.", true);
 			}
 		}

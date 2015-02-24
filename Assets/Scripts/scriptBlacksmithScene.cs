@@ -33,12 +33,25 @@ public class scriptBlacksmithScene : MonoBehaviour {
 
 	private List<Equipment> Equipments;
 
-	private object itemToBuy;
+	private Equipment itemToBuy;
 
 	private Player localPlayer;
 
 	private bool isBtnVoltarClicked;
 	private GameObject btnVoltar;
+
+	private GameObject spt11;
+	private GameObject spt12;
+	private GameObject spt13;
+	private GameObject spt14;
+	private GameObject spt21;
+	private GameObject spt22;
+	private GameObject spt23;
+	private GameObject spt24;
+	private GameObject spt31;
+	private GameObject spt32;
+	private GameObject spt33;
+	private GameObject spt34;
 
 	// Use this for initialization
 	void Start () 
@@ -84,21 +97,40 @@ public class scriptBlacksmithScene : MonoBehaviour {
 
 		isBtnVoltarClicked = false;
 		btnVoltar = GameObject.Find ("btnReturn");
+
+		spt11 = itemOne.transform.FindChild ("Sprite (item1.1)").gameObject;
+		spt12 = itemOne.transform.FindChild ("Sprite (item1.2)").gameObject;
+		spt13 = itemOne.transform.FindChild ("Sprite (item1.3)").gameObject;
+		spt14 = itemOne.transform.FindChild ("Sprite (item1.4)").gameObject;
+		spt21 = itemTwo.transform.FindChild ("Sprite (item2.1)").gameObject;
+		spt22 = itemTwo.transform.FindChild ("Sprite (item2.2)").gameObject;
+		spt23 = itemTwo.transform.FindChild ("Sprite (item2.3)").gameObject;
+		spt24 = itemTwo.transform.FindChild ("Sprite (item2.4)").gameObject;
+		spt31 = itemThree.transform.FindChild ("Sprite (item3.1)").gameObject;
+		spt32 = itemThree.transform.FindChild ("Sprite (item3.2)").gameObject;
+		spt33 = itemThree.transform.FindChild ("Sprite (item3.3)").gameObject;
+		spt34 = itemThree.transform.FindChild ("Sprite (item3.4)").gameObject;
 	}
 
 	void inicializeEquipmentsList() {
 
 		Equipments = new List<Equipment> ();
 		
-		for(int i = 1; i < 13; i++) {
-			if(i < 4) Equipments.Add(new Equipment("Sword", "Espadinha " + i, i*2.0f, 0.0f, i,5.0f*(float)(i),5.0f*((float)(i))/2, "Espadinha " + i + " e muito linda!"));
-			else if (i < 7) Equipments.Add(new Equipment("Armor", "Armadurinha " + (i-3), 0.0f, i*2.0f, i,5.0f*(float)(i),5.0f*((float)(i))/2, "Armadurinha " + (i-3) + " e muito linda!"));
-			else if (i < 10) Equipments.Add(new Equipment("Shield", "Escudinho " + (i-6), 0.0f, i*2.0f, i,5.0f*(float)(i),5.0f*((float)(i))/2, "Escudinho " + (i-6) + " e muito lindo!"));
-			else Equipments.Add(new Equipment("Bow", "Arquinho " + (i-9), i*2.5f, 0.0f, i,5.0f*(float)(i),5.0f*((float)(i))/2, "Arquinho " + (i-9) + " e muito lindo!"));
-
-			Debug.Log("Equipamento " + i + ": " + Equipments[i-1].GetNameEquipment());
-		}
+		Equipments.Add(new Equipment("Sword",1.2f,0.0f,275));
+		Equipments.Add(new Equipment("Sword",1.5f,0.0f,725));
+		Equipments.Add(new Equipment("Sword",1.8f,0.0f,1350));
+		Equipments.Add(new Equipment("Armor",0.0f,1.15f,320));
+		Equipments.Add(new Equipment("Armor",0.0f,1.4f,965));
+		Equipments.Add(new Equipment("Armor",0.0f,1.6f,1510));
+		Equipments.Add(new Equipment("Shield",0.0f,2.0f,200));
+		Equipments.Add(new Equipment("Shield",0.0f,4.0f,525));
+		Equipments.Add(new Equipment("Shield",0.0f,5.0f,830));
+		Equipments.Add(new Equipment("Bow",1.25f,0.0f,215));
+		Equipments.Add(new Equipment("Bow",1.45f,0.0f,595));
+		Equipments.Add(new Equipment("Bow",1.6f,0.0f,870));
 	}
+
+
 
 
 	// Update is called once per frame
@@ -124,9 +156,34 @@ public class scriptBlacksmithScene : MonoBehaviour {
 
 				if(itemOne.activeInHierarchy) {
 					//apenas modificar o que ja estiver la pelos sprites corretos
+					spt11.SetActive(true);
+					spt12.SetActive(false);
+					spt13.SetActive(false);
+					spt14.SetActive(false);
+					spt21.SetActive(true);
+					spt22.SetActive(false);
+					spt23.SetActive(false);
+					spt24.SetActive(false);
+					spt31.SetActive(true);
+					spt32.SetActive(false);
+					spt33.SetActive(false);
+					spt34.SetActive(false);
 
 				}else {
 					//alterar os sprites para as imagens corretas
+
+					spt11.SetActive(true);
+					spt12.SetActive(false);
+					spt13.SetActive(false);
+					spt14.SetActive(false);
+					spt21.SetActive(true);
+					spt22.SetActive(false);
+					spt23.SetActive(false);
+					spt24.SetActive(false);
+					spt31.SetActive(true);
+					spt32.SetActive(false);
+					spt33.SetActive(false);
+					spt34.SetActive(false);
 
 					itemOne.SetActive(true);
 					itemTwo.SetActive(true);
@@ -146,10 +203,34 @@ public class scriptBlacksmithScene : MonoBehaviour {
 				
 				if(itemOne.activeInHierarchy) {
 					//apenas modificar o que ja estiver la pelos sprites corretos
+					spt11.SetActive(false);
+					spt12.SetActive(true);
+					spt13.SetActive(false);
+					spt14.SetActive(false);
+					spt21.SetActive(false);
+					spt22.SetActive(true);
+					spt23.SetActive(false);
+					spt24.SetActive(false);
+					spt31.SetActive(false);
+					spt32.SetActive(true);
+					spt33.SetActive(false);
+					spt34.SetActive(false);
 					
 				}else {
 					//alterar os sprites para as imagens corretas
-					
+					spt11.SetActive(false);
+					spt12.SetActive(true);
+					spt13.SetActive(false);
+					spt14.SetActive(false);
+					spt21.SetActive(false);
+					spt22.SetActive(true);
+					spt23.SetActive(false);
+					spt24.SetActive(false);
+					spt31.SetActive(false);
+					spt32.SetActive(true);
+					spt33.SetActive(false);
+					spt34.SetActive(false);
+
 					itemOne.SetActive(true);
 					itemTwo.SetActive(true);
 					itemThree.SetActive(true);
@@ -168,9 +249,33 @@ public class scriptBlacksmithScene : MonoBehaviour {
 				
 				if(itemOne.activeInHierarchy) {
 					//apenas modificar o que ja estiver la pelos sprites corretos
+					spt11.SetActive(false);
+					spt12.SetActive(false);
+					spt13.SetActive(true);
+					spt14.SetActive(false);
+					spt21.SetActive(false);
+					spt22.SetActive(false);
+					spt23.SetActive(true);
+					spt24.SetActive(false);
+					spt31.SetActive(false);
+					spt32.SetActive(false);
+					spt33.SetActive(true);
+					spt34.SetActive(false);
 					
 				}else {
 					//alterar os sprites para as imagens corretas
+					spt11.SetActive(false);
+					spt12.SetActive(false);
+					spt13.SetActive(true);
+					spt14.SetActive(false);
+					spt21.SetActive(false);
+					spt22.SetActive(false);
+					spt23.SetActive(true);
+					spt24.SetActive(false);
+					spt31.SetActive(false);
+					spt32.SetActive(false);
+					spt33.SetActive(true);
+					spt34.SetActive(false);
 					
 					itemOne.SetActive(true);
 					itemTwo.SetActive(true);
@@ -190,9 +295,33 @@ public class scriptBlacksmithScene : MonoBehaviour {
 				
 				if(itemOne.activeInHierarchy) {
 					//apenas modificar o que ja estiver la pelos sprites corretos
+					spt11.SetActive(false);
+					spt12.SetActive(false);
+					spt13.SetActive(false);
+					spt14.SetActive(true);
+					spt21.SetActive(false);
+					spt22.SetActive(false);
+					spt23.SetActive(false);
+					spt24.SetActive(true);
+					spt31.SetActive(false);
+					spt32.SetActive(false);
+					spt33.SetActive(false);
+					spt34.SetActive(true);
 					
 				}else {
 					//alterar os sprites para as imagens corretas
+					spt11.SetActive(false);
+					spt12.SetActive(false);
+					spt13.SetActive(false);
+					spt14.SetActive(true);
+					spt21.SetActive(false);
+					spt22.SetActive(false);
+					spt23.SetActive(false);
+					spt24.SetActive(true);
+					spt31.SetActive(false);
+					spt32.SetActive(false);
+					spt33.SetActive(false);
+					spt34.SetActive(true);
 					
 					itemOne.SetActive(true);
 					itemTwo.SetActive(true);
@@ -212,10 +341,7 @@ public class scriptBlacksmithScene : MonoBehaviour {
 
 					itemInfo.SetActive(true);
 					information.SetActive(true);
-					btnComprar.SetActive(true);
-
-				}else {
-					//atualizar as informaçoes na telinha
+					//btnComprar.SetActive(true);
 				}
 
 				isItemOneClicked = false;
@@ -230,10 +356,7 @@ public class scriptBlacksmithScene : MonoBehaviour {
 
 					itemInfo.SetActive(true);
 					information.SetActive(true);
-					btnComprar.SetActive(true);
-					
-				}else {
-					//atualizar as informaçoes na telinha
+					//btnComprar.SetActive(true);	
 				}
 
 				isItemTwoClicked = false;
@@ -247,19 +370,27 @@ public class scriptBlacksmithScene : MonoBehaviour {
 
 					itemInfo.SetActive(true);
 					information.SetActive(true);
-					btnComprar.SetActive(true);
-					
-				}else {
-					//atualizar as informaçoes na telinha
+					//btnComprar.SetActive(true);	
 				}
 
 				isItemThreeClicked = false;
 			}else if(isBtnCompraClicked) {
 				//dar o item ao player
+				if(localPlayer.Gold >= itemToBuy.GetPriceOfPurchase()) {
+					if((itemToBuy.GetType().Equals("Sword")) || (itemToBuy.GetType().Equals("Bow"))) {
+						localPlayer.UpgradeWeapon(new Item(itemToBuy.GetAttack()));
+					}else if(itemToBuy.GetType().Equals("Armor")) {
+						localPlayer.UpgradeArmor(new Item(itemToBuy.GetDefense()));
+					}else {
+						localPlayer.UpgradeShield(new Item(itemToBuy.GetDefense()));
+					}
 
-				itemInfo.SetActive(false);
-				information.SetActive(false);
-				btnComprar.SetActive(false);
+					localPlayer.Gold -= itemToBuy.GetPriceOfPurchase();
+
+					itemInfo.SetActive(false);
+					information.SetActive(false);
+					btnComprar.SetActive(false);
+				}
 
 				isBtnCompraClicked = false;
 			}else if(isBtnVoltarClicked) {
@@ -270,6 +401,7 @@ public class scriptBlacksmithScene : MonoBehaviour {
 			}
 		}
 	}
+
 
 	object GetSelectedItem(int equipType, int position) {
 		List<Equipment> specificTypesEquipments = new List<Equipment> ();
@@ -313,27 +445,54 @@ public class scriptBlacksmithScene : MonoBehaviour {
 		Equipment selected = generic as Equipment;
 
 		if ((EQUIPMENT_ID != 2) && (EQUIPMENT_ID != 3)) {
-
-			Debug.Log("Selected Weapon: " + selected.GetNameEquipment());
 		
-			content.text = selected.GetNameEquipment() + "\n\n" +
-				"Attack: " + selected.GetAttack() + "\n" +
-				//"Defense: " + selected.GetDefense() + "\n" +
-				"Payload: " + selected.GetPayload() + "\n" +
-				"Price: " + selected.GetPriceOfPurchase() + "\n";
+			if((localPlayer.Items[1].Val == selected.GetDefense()) || (localPlayer.Items[2].Val == selected.GetDefense())) {
+				content.text = selected.GetTypeEquipment() + "s\n\n" +
+					"Attack: " + selected.GetAttack() + " rate\n" +
+						//"Defense: " + selected.GetDefense() + "\n" +
+						"Price: " + selected.GetPriceOfPurchase() + " gold\n\n\n" + 
+						"Owned!";
+
+				if(btnComprar.activeInHierarchy) {
+					btnComprar.SetActive(false);
+				}
+			}else {
+				content.text = selected.GetTypeEquipment() + "s\n\n" +
+					"Attack: " + selected.GetAttack() + " rate\n" +
+						//"Defense: " + selected.GetDefense() + "\n" +
+						"Price: " + selected.GetPriceOfPurchase() + " gold\n";
+
+				if(!btnComprar.activeInHierarchy) {
+					btnComprar.SetActive(true);
+				}
+			}
 		}else {
-			
-			Debug.Log("Selected Defender: " + selected.GetNameEquipment());
-			
-			content.text = selected.GetNameEquipment() + "\n\n" +
-				//"Attack: " + selected.GetAttack() + "\n" +
-				"Defense: " + selected.GetDefense() + "\n" +
-				"Payload: " + selected.GetPayload() + "\n" +
-				"Price: " + selected.GetPriceOfPurchase() + "\n";
+
+			if((localPlayer.Items[1].Val == selected.GetDefense()) || (localPlayer.Items[2].Val == selected.GetDefense())) {
+				content.text = selected.GetTypeEquipment() + "s\n\n" +
+					//"Attack: " + selected.GetAttack() + "\n" +
+					"Defense: " + selected.GetDefense() + " rate\n" +
+						"Price: " + selected.GetPriceOfPurchase() + " gold\n\n\n" + 
+						"Owned!";
+
+				if(btnComprar.activeInHierarchy) {
+					btnComprar.SetActive(false);
+				}
+			}else {
+				content.text = selected.GetTypeEquipment() + "s\n\n" +
+					//"Attack: " + selected.GetAttack() + "\n" +
+					"Defense: " + selected.GetDefense() + " rate\n" +
+						"Price: " + selected.GetPriceOfPurchase() + " gold\n";
+
+				if(!btnComprar.activeInHierarchy) {
+					btnComprar.SetActive(true);
+				}
+			}
 		}
 
 		itemToBuy = selected;
 	}
+
 
 
 	void onSwordsClicked()

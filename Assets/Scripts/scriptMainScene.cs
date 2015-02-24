@@ -17,8 +17,10 @@ public class scriptMainScene : MonoBehaviour {
 	private AudioSource auSong;
 
 	// mission 1 objs
-	private bool isTarget1Clicked;
 	private GameObject btnTarget1;
+	private GameObject btnTarget2;
+	private GameObject btnTarget3_1;
+	private GameObject btnTarget3_2;
 	private GameObject panel;
 	private GameObject music;
 
@@ -57,6 +59,9 @@ public class scriptMainScene : MonoBehaviour {
 		openScroll = false;
 
 		btnTarget1 = GameObject.Find ("btnTarget1");
+		btnTarget2 = GameObject.Find ("btnTarget2");
+		btnTarget3_1 = GameObject.Find ("btnTarget3-1");
+		btnTarget3_2 = GameObject.Find ("btnTarget3-2");
 
 		panel = GameObject.Find ("Panel");
 		music = GameObject.Find ("Camera");
@@ -71,20 +76,50 @@ public class scriptMainScene : MonoBehaviour {
 		if (scroll != null) {
 			scroll.SetActive (false);
 		}
-
-		int[] game = new int[]{Player.ENABLED, Player.DISABLED,Player.DISABLED,Player.DISABLED};
-		if(GameManager.player == null){
-			localPlayer = new Player (1570, 6, Player.generateTroop(50,50,50), 0, 0,game);
+		
+		if (GameManager.player == null) {
+			int[] game = new int[]{Player.ENABLED, Player.DISABLED,Player.DISABLED,Player.DISABLED};
+			localPlayer = new Player (1570, 6, Player.generateTroop (50, 50, 50), 0, 0, game);
 			GameManager.player = localPlayer;
+		} else {
+			localPlayer = GameManager.player;
 		}
-		localPlayer = GameManager.player;
+
+		for (int i = 0; i<4; i++) {
+			GameObject go = null;
+			switch(i){
+				case 0:
+					go = btnTarget1;
+					break;
+				case 1:
+					go = btnTarget2;
+					break;
+				case 2:
+					go = btnTarget3_1;
+					break;
+				case 3:
+					go = btnTarget3_2;
+					break;
+			}
+
+			try{
+				if (localPlayer.Game [i] == Player.DISABLED) {
+					go.SetActive(false);
+					//go.transform.FindChild("Label").GetComponent<UILabel>().color = Color.gray;
+				}else if(localPlayer.Game [i] == Player.WON){
+					go.transform.FindChild("Label").GetComponent<UILabel>().color = Color.green;
+					go.transform.FindChild("Label").GetComponent<UILabel>().text = "O";
+				}else if(localPlayer.Game [i] == Player.LOST){
+					go.transform.FindChild("Label").GetComponent<UILabel>().color = Color.black;
+				}
+			}catch(System.NullReferenceException e){}
+		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (localPlayer.Game [0] == 1) {
-
-		}
+		updateLog ();
+		updateStatus ();
 
 		if (isBlacksmithClicked) {
 						// current camera depth
@@ -236,9 +271,64 @@ public class scriptMainScene : MonoBehaviour {
 						isSaveGameClicked = false;
 						Debug.Log ("Save Game");
 						Application.LoadLevel("SaveGameMenuScene");
-		} else if (isTarget1Clicked){
-			Application.LoadLevel ("mission1Scene");
 		}
+	}
+
+	void updateLog(){
+		GameObject log = GameObject.Find ("Log");
+		UILabel content = log.GetComponent<UILabel> ();
+		
+		int swordmans = 0, knights = 0, archers = 0, wounded = 0;
+		int dead = localPlayer.Units.Deaths;
+		
+		for (int i = 0; i<localPlayer.Units.Units.Count; i++) {
+			if(localPlayer.Units.Units[i].Type.Equals(Unit.SWORDMAN)){
+				swordmans++;
+			}else if(localPlayer.Units.Units[i].Type.Equals(Unit.KNIGHT)){
+				knights++;
+			}else if(localPlayer.Units.Units[i].Type.Equals(Unit.ARCHER)){
+				archers++;
+			}
+			
+			if(localPlayer.Units.Units[i].Health < 100){
+				wounded++;
+			}
+		}
+		
+		content.text = "Combat log\n\n" +
+			"Swordmans: " + swordmans + "\n" +
+				"Knights: " + knights + "\n" +
+				"Archers: " + archers + "\n\n" +
+				"Dead soldiers: " + dead + "\n" +
+				"Wounded soldiers: " + wounded + "\n";
+		
+		// For debug only
+		//"Forest folk: "+villageTroops.Units.Count+"\n"+
+		//"Dead villagers: "+villageTroops.Deaths;
+	}
+	
+	void updateStatus(){
+		GameObject status = GameObject.Find ("Status");
+		UILabel content = status.GetComponent<UILabel> ();
+		
+		string moral = "";
+		if (localPlayer.Moral == 0) {
+			moral = "stable";
+		}else if(localPlayer.Moral < 0 && localPlayer.Moral >= -50){
+			moral = "low";
+		}
+		else if(localPlayer.Moral > 0 && localPlayer.Moral <= 50){
+			moral = "graceful";
+		}else if(localPlayer.Moral < -50){
+			moral = "critical";
+		}else if(localPlayer.Moral > 50){
+			moral = "untouchable";
+		}
+		
+		content.text = "Gold: "+localPlayer.Gold+"g\n"+
+			"Food: "+Mathf.Max((localPlayer.Food-localPlayer.Travelling),0)+" day(s) worth\n"+
+				"Troop's moral: "+moral+"\n"+
+				"Days traveling: "+localPlayer.Travelling+" day";
 	}
 
 	void OnGUI(){
@@ -279,11 +369,94 @@ public class scriptMainScene : MonoBehaviour {
 
 	void OnTarget1Clicked()
 	{
-		if (EditorUtility.DisplayDialog ("Start Mission 1", //title
-		                            "Are you sure you want to start the Mission 1?", // text
-		                            "OK", "Cancel")) { // yes, no
-						isTarget1Clicked = true;
-				}
+		if (localPlayer.Game [0] == Player.WON) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already won this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else if (localPlayer.Game [0] == Player.LOST) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already lost this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else {
+			if (EditorUtility.DisplayDialog ("Start Mission 1", //title
+			                                 "Are you sure you want to start the Mission 1?", // text
+			                                 "OK", "Cancel")) { // yes, no
+				Application.LoadLevel ("mission1Scene");
+			}
+		}
+	}
+
+	void OnTarget2Clicked()
+	{
+		if (localPlayer.Game [1] == Player.WON) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already won this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else if (localPlayer.Game [1] == Player.LOST) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already lost this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else {
+			if (EditorUtility.DisplayDialog ("Start Mission 2", //title
+			                                 "Are you sure you want to start the Mission 1?", // text
+			                                 "OK", "Cancel")) { // yes, no
+				Application.LoadLevel ("mission2Scene");
+			}
+		}
+	}
+
+	void OnTarget3_1Clicked()
+	{
+		if (localPlayer.Game [2] == Player.WON) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already won this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else if (localPlayer.Game [2] == Player.LOST) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already lost this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else {
+			if (EditorUtility.DisplayDialog ("Start Mission 1", //title
+			                                 "Are you sure you want to start the Mission 1?", // text
+			                                 "OK", "Cancel")) { // yes, no
+				Application.LoadLevel ("mission3_1Scene");
+			}
+		}
+	}
+
+	void OnTarget3_2Clicked()
+	{
+		if (localPlayer.Game [3] == Player.WON) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already won this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else if (localPlayer.Game [3] == Player.LOST) {
+			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			                                 "You already lost this mission!", // text
+			                                 "OK")) { // yes, no
+				//isTarget1Clicked = true;
+			}
+		} else {
+			if (EditorUtility.DisplayDialog ("Start Mission 1", //title
+			                                 "Are you sure you want to start the Mission 1?", // text
+			                                 "OK", "Cancel")) { // yes, no
+				Application.LoadLevel ("mission3_2Scene");
+			}
+		}
 	}
 
 	void awake(){

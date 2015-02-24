@@ -900,10 +900,18 @@ public class Mission2Script : MonoBehaviour {
 			ok = "Proceed";
 			//localPlayer.Game = new bool[]{true};
 			localPlayer.Game[1] = Player.WON;
+			if(mahajaTroops.Units.Count == 0){
+				localPlayer.Game[2] = Player.ENABLED;
+			}
+			if(icegardTroops.Units.Count == 0){
+				localPlayer.Game[3] = Player.ENABLED;
+			}
+
 		} else {
 			title = "You lose!";
 			ok = "Try again";
 			localPlayer.Game[1] = Player.LOST;
+			GameManager.player = localPlayer;
 		}
 		//dialog.showSingleDialogMessage(title, msg, ok);
 		/*

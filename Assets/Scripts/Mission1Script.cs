@@ -558,11 +558,14 @@ public class Mission1Script : MonoBehaviour {
 			auV.Play();
 			//localPlayer.Game = new bool[]{true};
 			localPlayer.Game[0] = Player.WON;
+			localPlayer.Game[1] = Player.ENABLED;
+			GameManager.player = localPlayer;
 		} else {
 			title = "You lose!";
 			ok = "Try again";
 			auD.Play();
 			localPlayer.Game[0] = Player.LOST;
+			GameManager.player = localPlayer;
 
 			singleButton = true;
 			dialogPos = "finalMessage";

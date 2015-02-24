@@ -36,8 +36,14 @@ public class scriptMainScene : MonoBehaviour {
 
 	private Player localPlayer;
 
+	private DialogUtils dialog;
+	private bool startMission;
+
 	// Use this for initialization
 	void Start () {
+		dialog = new DialogUtils();
+		dialog.hideDialog();
+		startMission = false;
 		isBlacksmithClicked = false;
 		isMedicalCenterClicked = false;
 		isTrainingCenterClicked = false;
@@ -76,11 +82,11 @@ public class scriptMainScene : MonoBehaviour {
 		if (scroll != null) {
 			scroll.SetActive (false);
 		}
-		
+
 		if (GameManager.player == null) {
 			int[] game = new int[]{Player.ENABLED, Player.DISABLED,Player.DISABLED,Player.DISABLED};
-			localPlayer = new Player (1570, 6, Player.generateTroop (50, 50, 50), 0, 0, game);
-			GameManager.player = localPlayer;
+			this.localPlayer = new Player (1570, 6, Player.generateTroop (50, 50, 50), 0, 0, game);
+			GameManager.player = this.localPlayer;
 		} else {
 			localPlayer = GameManager.player;
 		}
@@ -367,27 +373,46 @@ public class scriptMainScene : MonoBehaviour {
 		isSaveGameClicked = true;
 	}
 
-	void OnTarget1Clicked()
-	{
+	void OnTarget1Clicked() {
 		if (localPlayer.Game [0] == Player.WON) {
-			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			dialog.showSingleDialogMessage("Mission not playable", //title
+			                               "You already won this mission!", // text
+			                               "OK");
+			/*if (EditorUtility.DisplayDialog ("Mission not playable", //title
 			                                 "You already won this mission!", // text
 			                                 "OK")) { // yes, no
 				//isTarget1Clicked = true;
-			}
+			}*/
 		} else if (localPlayer.Game [0] == Player.LOST) {
-			if (EditorUtility.DisplayDialog ("Mission not playable", //title
+			dialog.showSingleDialogMessage("Mission not playable", //title
+			                               "You already lost this mission!", // text
+			                               "OK");
+			/*if (EditorUtility.DisplayDialog ("Mission not playable", //title
 			                                 "You already lost this mission!", // text
 			                                 "OK")) { // yes, no
 				//isTarget1Clicked = true;
-			}
+			}*/
 		} else {
-			if (EditorUtility.DisplayDialog ("Start Mission 1", //title
+			startMission = true;
+			dialog.showDialogMessage("Start Mission 1", //title
+			                         "Are you sure you want to start the Mission 1?", // text
+			                         "OK", "Cancel");
+			/*if (EditorUtility.DisplayDialog ("Start Mission 1", //title
 			                                 "Are you sure you want to start the Mission 1?", // text
 			                                 "OK", "Cancel")) { // yes, no
 				Application.LoadLevel ("mission1Scene");
-			}
+			}*/
 		}
+	}
+
+	void onButton1Clicked(){
+		if(startMission){
+			Application.LoadLevel ("mission1Scene");
+		}
+	}
+
+	void onButton2Clicked(){
+		dialog.hideDialog();
 	}
 
 	void OnTarget2Clicked()
@@ -460,7 +485,7 @@ public class scriptMainScene : MonoBehaviour {
 	}
 
 	void awake(){
-		DontDestroyOnLoad (music);
+		//DontDestroyOnLoad (music);
 	}
 }
 #endif

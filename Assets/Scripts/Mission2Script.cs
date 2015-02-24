@@ -1075,7 +1075,7 @@ public class Mission2Script : MonoBehaviour {
 			singleButton = true;
 			dialog.showSingleDialogMessage("No route selected!",
 			                         "You must select a route to one of the castles.\n" +
-			                         "You can either go through the outpost village or direct to the desired castle.",
+			                         "You can either go through the outpost village or \ndirect to the desired castle.",
 			                         "OK");
 			// TODO
 			/*if (EditorUtility.DisplayDialog ("No route selected!", //title
@@ -1090,10 +1090,10 @@ public class Mission2Script : MonoBehaviour {
 			if(mahajaClicked) info = "Hint: Attacking Mahaja will declare war against their kingdom.\n" +
 				"They will become your enemies and many attempts of peace will be lost.";
 			else info = "Hint: Attacking Icegard might be a dificult task since they are remarcable figthers," +
-				"but will provide much information about their culture and strategy.";
+				"\nbut will provide much information about their culture and strategy.";
 			
 			if(outpostClicked) info += "\n\nAlso: Attacking the outpost will take more time of travel and resources.";
-			else info += "\n\nAlso: Going directly is a risky strategy since you might be attacked by two fronts.";
+			else info += "\n\nAlso: Going directly is a risky strategy since \nyou might be attacked by two fronts.";
 
 			dialogPos = "startMessage";
 			singleButton = false;
@@ -1121,7 +1121,7 @@ public class Mission2Script : MonoBehaviour {
 			}else if(dialogPos == "finalMessage"){
 				tutorialOn = true;
 				canContinue = false;
-				//Application.LoadLevel("mainScene");
+				Application.LoadLevel("mainScene");
 			}
 		}else{
 			if(dialogPos == "startMessage"){
@@ -1209,8 +1209,8 @@ public class Mission2Script : MonoBehaviour {
 		dialogPos = "mahajaChoiceMessage";
 		singleButton = false;
 		dialog.showDialogMessage("Aftermatch!", //title
-		                         "The castle is now yours. But the outpost has been taken by the forces of icegard.\n"+
-		                         "You can concede the outpost to them and avoid more battles, or attack them as well.",
+		                         "The castle is now yours. \nBut the outpost has been taken by the forces of icegard.\n"+
+		                         "You can concede the outpost to them and avoid more battles, \nor attack them as well.",
 		                         "Concede", "Attack");
 		/*
 		if (EditorUtility.DisplayDialog ("Aftermatch!", //title
@@ -1231,8 +1231,8 @@ public class Mission2Script : MonoBehaviour {
 		dialogPos = "icegardChoiceMessage";
 		singleButton = false;
 		dialog.showDialogMessage("Aftermatch!", //title
-		                         "The castle is now yours. But the outpost has been taken by the forces of mahaja.\n"+
-		                         "You can concede the outpost to them for 1000g and avoid more battles, or attack them as well.",
+		                         "The castle is now yours. \nBut the outpost has been taken by the forces of mahaja.\n"+
+		                         "You can concede the outpost to them for 1000g and avoid more battles, \nor attack them as well.",
 		                         "Concede, gain 1000g", "Attack");
 		/*
 		if (EditorUtility.DisplayDialog ("Aftermatch!", //title
